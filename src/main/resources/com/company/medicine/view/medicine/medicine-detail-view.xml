@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://medicineDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="medicineDc"
+                  class="com.company.medicine.entity.Medicine">
+            <fetchPlan extends="_base">
+            </fetchPlan>
+            <loader id="medicineDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="medicineDc">
+            <textField id="activeIngredientNameField" property="activeIngredientName"/>
+            <textField id="activeIngredientStrengthField" property="activeIngredientStrength"/>
+            <textField id="applicationDocsField" property="applicationDocs"/>
+            <datePicker id="applicationDocsDateField" property="applicationDocsDate"/>
+            <textField id="applicationDocsTypeField" property="applicationDocsType"/>
+            <textField id="applicationDocsUrlField" property="applicationDocsUrl"/>
+            <textField id="applicationNumberField" property="applicationNumber"/>
+            <textField id="brandNameField" property="brandName"/>
+            <textField id="dosageFormField" property="dosageForm"/>
+            <textField id="marketingStatusField" property="marketingStatus"/>
+            <textField id="priceField" property="price"/>
+            <textField id="productNumberField" property="productNumber"/>
+            <checkbox id="referenceDrugField" property="referenceDrug"/>
+            <checkbox id="referenceStandardField" property="referenceStandard"/>
+            <textField id="reviewPriorityField" property="reviewPriority"/>
+            <textField id="routeField" property="route"/>
+            <textField id="sponsorNameField" property="sponsorName"/>
+            <textField id="submissionClassCodeDescriptionField" property="submissionClassCodeDescription"/>
+            <textField id="submissionNumberField" property="submissionNumber"/>
+            <textField id="submissionStatusField" property="submissionStatus"/>
+            <datePicker id="submissionStatusDateField" property="submissionStatusDate"/>
+            <textField id="submissionTypeField" property="submissionType"/>
+            <textField id="teCodeField" property="teCode"/>
+            <textField id="idField" property="id" visible="false"/>
+        </formLayout>
+        <hbox id="detailActions">
+            <button id="saveAndCloseBtn" action="saveAction"/>
+            <button id="closeBtn" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>
