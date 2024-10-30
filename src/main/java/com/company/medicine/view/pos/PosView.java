@@ -4,7 +4,9 @@ import com.company.medicine.entity.Stock;
 import com.company.medicine.view.main.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -34,16 +36,21 @@ public class PosView extends StandardView {
     private TextField totalField;
     private Button processButton;
 
+    // Add a grid to display recent updates
+    private Grid<Stock> recentUpdatesGrid;
+
     @Subscribe
     public void onInit(InitEvent event) {
         initComponents();
         setupListeners();
+        loadRecentUpdates(); // Load recent updates when the view initializes
     }
 
     private void initComponents() {
         VerticalLayout layout = new VerticalLayout();
 
-        H3 title = new H3("Point of Sale");
+        H4 title = new H4("Point of Sale");
+        H4 title2 = new H4("Recent Updates");
 
         // Medicine selection
         medicineSelect = new ComboBox<>("Select Medicine");
@@ -64,7 +71,23 @@ public class PosView extends StandardView {
         // Process button
         processButton = new Button("Process Sale", event -> processSale());
 
-        layout.add(title, medicineSelect, quantityField, totalField, processButton);
+        // Initialize the recent updates grid
+        recentUpdatesGrid = new Grid<>(Stock.class);
+        recentUpdatesGrid.setItems(loadAvailableStock()); // Load available stock into the grid
+        recentUpdatesGrid.setColumns("brandName", "activeIngredientName", "activeIngredientStrength", "dosageForm", "price", "quantity","expirationDate");
+        recentUpdatesGrid.setColumnOrder(recentUpdatesGrid.getColumnByKey("brandName"),
+                recentUpdatesGrid.getColumnByKey("activeIngredientName"),
+                recentUpdatesGrid.getColumnByKey("activeIngredientStrength"),
+                recentUpdatesGrid.getColumnByKey("dosageForm"),
+                recentUpdatesGrid.getColumnByKey("price"),
+                recentUpdatesGrid.getColumnByKey("quantity"),
+                recentUpdatesGrid.getColumnByKey("expirationDate"));
+
+        recentUpdatesGrid.setWidth("100%"); // Set the width of the grid
+        recentUpdatesGrid.setHeight("500px"); // Set the width of the grid
+
+        // Add components to the layout
+        layout.add(title, medicineSelect, quantityField, totalField, processButton,title2,recentUpdatesGrid );
         getContent().add(layout);
     }
 
@@ -133,6 +156,7 @@ public class PosView extends StandardView {
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 
             resetForm();
+            loadRecentUpdates(); // Reload recent updates after processing the sale
 
         } catch (Exception e) {
             showError("Error processing sale: " + e.getMessage());
@@ -149,5 +173,9 @@ public class PosView extends StandardView {
         quantityField.setValue(1);
         totalField.clear();
         medicineSelect.setItems(loadAvailableStock());
+    }
+
+    private void loadRecentUpdates() {
+        recentUpdatesGrid.setItems(loadAvailableStock());
     }
 }
