@@ -67,6 +67,8 @@
                         property="expirationDate" required="true"/>
         </formLayout>
         <hbox id="detailActions">
+
+
             <button id="saveAndCloseBtn" action="saveAction"/>
             <button id="closeBtn" action="closeAction"/>
         </hbox>
