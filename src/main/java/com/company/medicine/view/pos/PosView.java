@@ -47,7 +47,7 @@ public class PosView extends StandardView {
         VerticalLayout layout = new VerticalLayout();
 
         H4 title = new H4("Point of Sale");
-        H4 title2 = new H4("Recent Updates");
+        H4 title2 = new H4("Stock Available");
 
         // Medicine selection
         medicineSelect = new ComboBox<>("Select Medicine");
@@ -60,8 +60,8 @@ public class PosView extends StandardView {
         quantityField = new IntegerField("Quantity");
         quantityField.setValue(1);
         quantityField.setMin(1);
-        quantityField.setHelperText("Max available items will be set automatically"); // Updated helper text
-        quantityField.setStepButtonsVisible(true); // Show increment/decrement buttons
+        quantityField.setHelperText("Max available items will be set automatically");
+        quantityField.setStepButtonsVisible(true);
         quantityField.setRequiredIndicatorVisible(true);
 
         // Total display
@@ -74,22 +74,39 @@ public class PosView extends StandardView {
         // Recent updates grid
         recentUpdatesGrid = new Grid<>(Stock.class);
         recentUpdatesGrid.setItems(loadAvailableStock());
+
+        // Set columns and enable resizing
         recentUpdatesGrid.setColumns("brandName", "activeIngredientName", "activeIngredientStrength",
                 "dosageForm", "price", "quantity", "expirationDate");
-        recentUpdatesGrid.setWidth("100%");
-        recentUpdatesGrid.setHeight("500px");
 
+        // Enable resizable columns
+        recentUpdatesGrid.getColumnByKey("brandName").setResizable(true);
+        recentUpdatesGrid.getColumnByKey("activeIngredientName").setResizable(true);
+        recentUpdatesGrid.getColumnByKey("activeIngredientStrength").setResizable(true);
+        recentUpdatesGrid.getColumnByKey("dosageForm").setResizable(true);
+        recentUpdatesGrid.getColumnByKey("price").setResizable(true);
+        recentUpdatesGrid.getColumnByKey("quantity").setResizable(true);
+        recentUpdatesGrid.getColumnByKey("expirationDate").setResizable(true);
+
+        // Set fixed height and enable scrolling
+        recentUpdatesGrid.setHeight("400px"); // Fixed height
+        recentUpdatesGrid.getElement().getStyle().set("overflow", "auto"); // Allow scrolling
+
+        // Make grid stretch horizontally
+        recentUpdatesGrid.setWidthFull();
+
+        // Add components to layout
         layout.add(title, medicineSelect, quantityField, totalField, processButton, title2, recentUpdatesGrid);
+        layout.setSizeFull(); // Make layout occupy full available space
         getContent().add(layout);
     }
 
     private void setupListeners() {
         medicineSelect.addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                // Update the maximum limit based on the selected medicine's available quantity
                 quantityField.setMax(event.getValue().getQuantity());
-                quantityField.setValue(1); // Reset quantity to 1 when a new medicine is selected
-                updateTotal(); // Update the total immediately
+                quantityField.setValue(1);
+                updateTotal();
             }
         });
 
@@ -118,7 +135,6 @@ public class PosView extends StandardView {
         Stock selectedStock = medicineSelect.getValue();
         Integer requestedQuantity = quantityField.getValue();
 
-        // Validation
         if (selectedStock == null) {
             showError("Please select a medicine.");
             return;
@@ -140,7 +156,6 @@ public class PosView extends StandardView {
             return;
         }
 
-        // Process sale
         try {
             selectedStock.setQuantity(selectedStock.getQuantity() - requestedQuantity);
             dataManager.save(selectedStock);

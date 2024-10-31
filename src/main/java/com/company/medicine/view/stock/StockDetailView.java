@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ViewController("Stock.detail")
 @ViewDescriptor("stock-detail-view.xml")
 @EditedEntityContainer("stockDc")
-@DialogMode(width = "800px",height = "400px")
+@DialogMode(width = "800px",height = "500px")
 public class StockDetailView extends StandardDetailView<Stock> {
 
     @ViewComponent
