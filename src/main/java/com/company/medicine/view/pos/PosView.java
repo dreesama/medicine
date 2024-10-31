@@ -5,7 +5,6 @@ import com.company.medicine.view.main.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -35,15 +34,13 @@ public class PosView extends StandardView {
     private IntegerField quantityField;
     private TextField totalField;
     private Button processButton;
-
-    // Add a grid to display recent updates
     private Grid<Stock> recentUpdatesGrid;
 
     @Subscribe
     public void onInit(InitEvent event) {
         initComponents();
         setupListeners();
-        loadRecentUpdates(); // Load recent updates when the view initializes
+        loadRecentUpdates();
     }
 
     private void initComponents() {
@@ -63,42 +60,40 @@ public class PosView extends StandardView {
         quantityField = new IntegerField("Quantity");
         quantityField.setValue(1);
         quantityField.setMin(1);
+        quantityField.setHelperText("Max available items will be set automatically"); // Updated helper text
+        quantityField.setStepButtonsVisible(true); // Show increment/decrement buttons
+        quantityField.setRequiredIndicatorVisible(true);
 
         // Total display
-        totalField = new TextField("Total Amount");
+        totalField = new TextField("Total Amount (₱)");
         totalField.setReadOnly(true);
 
         // Process button
         processButton = new Button("Process Sale", event -> processSale());
 
-        // Initialize the recent updates grid
+        // Recent updates grid
         recentUpdatesGrid = new Grid<>(Stock.class);
-        recentUpdatesGrid.setItems(loadAvailableStock()); // Load available stock into the grid
-        recentUpdatesGrid.setColumns("brandName", "activeIngredientName", "activeIngredientStrength", "dosageForm", "price", "quantity","expirationDate");
-        recentUpdatesGrid.setColumnOrder(recentUpdatesGrid.getColumnByKey("brandName"),
-                recentUpdatesGrid.getColumnByKey("activeIngredientName"),
-                recentUpdatesGrid.getColumnByKey("activeIngredientStrength"),
-                recentUpdatesGrid.getColumnByKey("dosageForm"),
-                recentUpdatesGrid.getColumnByKey("price"),
-                recentUpdatesGrid.getColumnByKey("quantity"),
-                recentUpdatesGrid.getColumnByKey("expirationDate"));
+        recentUpdatesGrid.setItems(loadAvailableStock());
+        recentUpdatesGrid.setColumns("brandName", "activeIngredientName", "activeIngredientStrength",
+                "dosageForm", "price", "quantity", "expirationDate");
+        recentUpdatesGrid.setWidth("100%");
+        recentUpdatesGrid.setHeight("500px");
 
-        recentUpdatesGrid.setWidth("100%"); // Set the width of the grid
-        recentUpdatesGrid.setHeight("500px"); // Set the width of the grid
-
-        // Add components to the layout
-        layout.add(title, medicineSelect, quantityField, totalField, processButton,title2,recentUpdatesGrid );
+        layout.add(title, medicineSelect, quantityField, totalField, processButton, title2, recentUpdatesGrid);
         getContent().add(layout);
     }
 
     private void setupListeners() {
-        quantityField.addValueChangeListener(event -> updateTotal());
         medicineSelect.addValueChangeListener(event -> {
-            updateTotal();
             if (event.getValue() != null) {
+                // Update the maximum limit based on the selected medicine's available quantity
                 quantityField.setMax(event.getValue().getQuantity());
+                quantityField.setValue(1); // Reset quantity to 1 when a new medicine is selected
+                updateTotal(); // Update the total immediately
             }
         });
+
+        quantityField.addValueChangeListener(event -> updateTotal());
     }
 
     private List<Stock> loadAvailableStock() {
@@ -113,7 +108,7 @@ public class PosView extends StandardView {
 
         if (selectedStock != null && quantity != null) {
             BigDecimal total = selectedStock.getPrice().multiply(new BigDecimal(quantity));
-            totalField.setValue(total.toString());
+            totalField.setValue("₱ " + total.toString());
         } else {
             totalField.clear();
         }
@@ -156,7 +151,7 @@ public class PosView extends StandardView {
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 
             resetForm();
-            loadRecentUpdates(); // Reload recent updates after processing the sale
+            loadRecentUpdates();
 
         } catch (Exception e) {
             showError("Error processing sale: " + e.getMessage());
