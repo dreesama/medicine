@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<menu-config xmlns="http://jmix.io/schema/flowui/menu">
+
+    <menu id="application" title="msg://com.company.medicine/menu.application.title" opened="true">
+        <item view="DashboardView" title="msg://com.company.medicine.view.dashboard/dashboardView.title" icon="LINE_BAR_CHART"/>
+        <item view="Medicine.list" title="msg://com.company.medicine.view.medicine/medicineListView.title" icon="vaadin:pills"/>
+        <item view="Stock.list" title="msg://com.company.medicine.view.stock/stockListView.title" icon="vaadin:clipboard-text"/>
+        <item view="PosView" title="msg://com.company.medicine.view.pos/posView.title" icon="vaadin:money"/>
+
+
+    </menu>
+    <menu id="application2" title="msg://com.company.medicine/menu.application.title2" opened="true">
+        <item view="LowStockView" title="msg://com.company.medicine.view.stock/lowStockView.title" icon="vaadin:warning"/>
+        <item view="OutOfStock" title="msg://com.company.medicine.view.stock/outOfStock.title" icon="vaadin:exclamation-circle"/>
+        <item view="ExpiringSoon" title="msg://com.company.medicine.view.stock/expiringSoon.title" icon="vaadin:hourglass"/>
+        <item view="ExpiredMedicine" title="msg://com.company.medicine.view.stock/expiredMedicine.title" icon="vaadin:trash"/>
+    </menu>
+
+    <menu id="users" title="Manage Account" opened="true">
+        <item view="User.list" title="msg://com.company.medicine.view.user/UserListView.title" icon="vaadin:user-heart"/>
+    </menu>
+
+</menu-config>

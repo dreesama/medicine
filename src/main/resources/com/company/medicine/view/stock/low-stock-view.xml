@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      xmlns:c="http://jmix.io/schema/flowui/jpql-condition"
+      title="msg://lowStockView.title"
+      focusComponent="stocksDataGrid">
+    <data>
+        <collection id="stocksDc"
+                    class="com.company.medicine.entity.Stock">
+            <fetchPlan extends="_base"/>
+            <loader id="stocksDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from Stock e where e.quantity < 100]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+        <urlQueryParameters>
+            <genericFilter component="genericFilter"/>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="selectAction" type="lookup_select"/>
+        <action id="discardAction" type="lookup_discard"/>
+    </actions>
+    <layout>
+        <genericFilter id="genericFilter"
+                       dataLoader="stocksDl">
+            <properties include=".*"/>
+        </genericFilter>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <button id="createBtn" action="stocksDataGrid.create"/>
+            <button id="readBtn" action="stocksDataGrid.read"/>
+            <button id="editBtn" action="stocksDataGrid.edit"/>
+            <button id="removeBtn" action="stocksDataGrid.remove"/>
+            <button id="exportPdfBtn" text="Generate Report" icon="vaadin:file"/>
+            <simplePagination id="pagination" dataLoader="stocksDl"/>
+        </hbox>
+        <dataGrid id="stocksDataGrid"
+                  width="100%"
+                  minHeight="20em"
+                  dataContainer="stocksDc"
+                  columnReorderingAllowed="true">
+            <actions>
+                <action id="create" type="list_create"/>
+                <action id="edit" type="list_edit"/>
+                <action id="read" type="list_read"/>
+                <action id="remove" type="list_remove"/>
+            </actions>
+            <columns resizable="true">
+                <column property="brandName"/>
+                <column property="activeIngredientName"/>
+                <column property="activeIngredientStrength"/>
+                <column property="dosageForm"/>
+                <column property="price"/>
+                <column property="quantity"/>
+                <column property="expirationDate"/>
+            </columns>
+        </dataGrid>
+        <hbox id="lookupActions" visible="false">
+            <button id="selectBtn" action="selectAction"/>
+            <button id="discardBtn" action="discardAction"/>
+        </hbox>
+    </layout>
+</view>

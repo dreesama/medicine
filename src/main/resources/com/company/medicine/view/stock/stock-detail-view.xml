@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://stockDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="stockDc"
+                  class="com.company.medicine.entity.Stock">
+            <fetchPlan extends="_base">
+                <property name="medicine" fetchPlan="_instance_name">
+                    <property name="brandName"/>
+                    <property name="activeIngredientName"/>
+                    <property name="activeIngredientStrength"/>
+                    <property name="dosageForm"/>
+                    <property name="price"/>
+                </property>
+            </fetchPlan>
+            <loader id="stockDl"/>
+        </instance>
+
+        <collection id="medicinesDc"
+                    class="com.company.medicine.entity.Medicine">
+            <fetchPlan>
+                <property name="brandName"/>
+                <property name="activeIngredientName"/>
+                <property name="activeIngredientStrength"/>
+                <property name="dosageForm"/>
+                <property name="price"/>
+            </fetchPlan>
+            <loader id="medicinesDl">
+                <query>
+                    <![CDATA[select e from Medicine e order by e.brandName]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="stockDc">
+            <entityComboBox id="medicineField"
+                            property="medicine"
+                            itemsContainer="medicinesDc"/>
+            <textField id="brandNameField"
+                       property="brandName"
+                       readOnly="true"/>
+            <textField id="activeIngredientNameField"
+                       property="activeIngredientName"
+                       readOnly="true"/>
+            <textField id="activeIngredientStrengthField"
+                       property="activeIngredientStrength"
+                       readOnly="true"/>
+            <textField id="dosageFormField"
+                       property="dosageForm"
+                       readOnly="true"/>
+            <textField id="priceField"
+                       property="price"
+                       readOnly="true"/>
+            <textField id="quantityField"
+                       property="quantity" required="true"/>
+            <datePicker id="expirationDateField"
+                        property="expirationDate" required="true"/>
+        </formLayout>
+        <hbox id="detailActions">
+
+
+            <button id="saveAndCloseBtn" action="saveAction"/>
+            <button id="closeBtn" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>
