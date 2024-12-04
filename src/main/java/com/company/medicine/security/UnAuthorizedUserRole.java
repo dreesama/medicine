@@ -16,14 +16,14 @@ public interface UnAuthorizedUserRole {
     String CODE = "un-authorized-user";
 
     @MenuPolicy(menuIds = {"PosView", "Stock.list", "Medicine.list", "LowStockView", "OutOfStock", "ExpiredMedicine", "ExpiringSoon", "DashboardView"})
-    @ViewPolicy(viewIds = {"Medicine.list", "Stock.list", "PosView", "LowStockView", "OutOfStock", "ExpiredMedicine", "ExpiringSoon", "LoginView", "Medicine.detail", "DashboardView", "MainView"})
+    @ViewPolicy(viewIds = {"Medicine.list", "Stock.list", "PosView", "LowStockView", "OutOfStock", "ExpiredMedicine", "ExpiringSoon", "LoginView", "Medicine.detail", "DashboardView", "MainView", "Stock.detail"})
     void screens();
 
     @EntityAttributePolicy(entityClass = Medicine.class, attributes = "*", action = EntityAttributePolicyAction.MODIFY)
     @EntityPolicy(entityClass = Medicine.class, actions = EntityPolicyAction.ALL)
     void medicine();
 
-    @EntityAttributePolicy(entityClass = Stock.class, attributes = {"id", "activeIngredientName", "activeIngredientStrength", "dosageForm", "price", "quantity", "expirationDate", "brandName", "medicine", "*"}, action = EntityAttributePolicyAction.MODIFY)
+    @EntityAttributePolicy(entityClass = Stock.class, attributes = {"id", "activeIngredientName", "activeIngredientStrength", "dosageForm", "price", "expirationDate", "brandName", "medicine", "*"}, action = EntityAttributePolicyAction.MODIFY)
     @EntityPolicy(entityClass = Stock.class, actions = EntityPolicyAction.ALL)
     void stock();
 

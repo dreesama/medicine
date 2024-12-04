@@ -25,7 +25,20 @@ public class ExcelExportService {
 
             // Create header row
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"Brand name", "Active ingredient name", "Strength", "Dosage form", "Price", "Quantity", "Expiration date"};
+            String[] columns = {
+                    "Brand name",
+                    "Active ingredient name",
+                    "Strength",
+                    "Dosage form",
+                    "Package type",
+                    "Units per package",
+                    "Package quantity",
+                    "Total units",
+                    "Price",
+                    "Unit price",
+                    "Expiration date",
+                    "Storage location"
+            };
 
             // Style for header
             CellStyle headerStyle = workbook.createCellStyle();
@@ -41,17 +54,35 @@ public class ExcelExportService {
                 cell.setCellStyle(headerStyle);
             }
 
+            // Create styles for numbers and currency
+            CellStyle currencyStyle = workbook.createCellStyle();
+            DataFormat format = workbook.createDataFormat();
+            currencyStyle.setDataFormat(format.getFormat("$#,##0.00"));
+
             // Populate data rows
             int rowNum = 1;
             for (Stock stock : stocks) {
                 Row row = sheet.createRow(rowNum++);
+
                 row.createCell(0).setCellValue(stock.getBrandName());
                 row.createCell(1).setCellValue(stock.getActiveIngredientName());
                 row.createCell(2).setCellValue(stock.getActiveIngredientStrength());
                 row.createCell(3).setCellValue(stock.getDosageForm());
-                row.createCell(4).setCellValue(stock.getPrice() != null ? stock.getPrice().doubleValue() : 0);
-                row.createCell(5).setCellValue(stock.getQuantity());
-                row.createCell(6).setCellValue(formatDate(stock.getExpirationDate()));
+                row.createCell(4).setCellValue(stock.getPackageType() != null ? stock.getPackageType().toString() : "");
+                row.createCell(5).setCellValue(stock.getUnitsPerPackage() != null ? stock.getUnitsPerPackage() : 0);
+                row.createCell(6).setCellValue(stock.getPackageQuantity() != null ? stock.getPackageQuantity() : 0);
+//                row.createCell(7).setCellValue(stock.getTotalUnits() != null ? stock.getTotalUnits() : 0);
+
+                // Price cells with currency formatting
+                Cell priceCell = row.createCell(8);
+                priceCell.setCellStyle(currencyStyle);
+                priceCell.setCellValue(stock.getPricePerPackage() != null ? stock.getPricePerPackage().doubleValue() : 0.0);
+
+                Cell unitPriceCell = row.createCell(9);
+                unitPriceCell.setCellStyle(currencyStyle);
+                unitPriceCell.setCellValue(stock.getPricePerUnit() != null ? stock.getPricePerUnit().doubleValue() : 0.0);
+
+                row.createCell(10).setCellValue(formatDate(stock.getExpirationDate()));
             }
 
             // Auto-size columns

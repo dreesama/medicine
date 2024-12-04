@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="medicine">
+        <dropTable cascadeConstraints="true" tableName="user_"/>
+    </changeSet>
+    <changeSet id="2" author="medicine">
+        <dropColumn columnName="batch_number" tableName="stock"/>
+
+        <dropColumn columnName="created_by" tableName="stock"/>
+
+        <dropColumn columnName="minimum_stock_level" tableName="stock"/>
+
+        <dropColumn columnName="package_size" tableName="stock"/>
+    </changeSet>
+    <changeSet id="3" author="medicine">
+        <modifyDataType columnName="PACKAGE_TYPE" newDataType="VARCHAR(255)" tableName="stock"/>
+    </changeSet>
+    <changeSet id="4" author="medicine">
+        <modifyDataType columnName="STORAGE_CONDITIONS" newDataType="VARCHAR(255)" tableName="stock"/>
+    </changeSet>
+    <changeSet id="5" author="medicine">
+        <modifyDataType columnName="STORAGE_LOCATION" newDataType="VARCHAR(255)" tableName="stock"/>
+    </changeSet>
+    <changeSet id="6" author="medicine">
+        <modifyDataType columnName="UNIT_TYPE" newDataType="VARCHAR(255)" tableName="stock"/>
+    </changeSet>
+    <changeSet id="7" author="medicine">
+        <modifyDataType columnName="unit_price" newDataType="DECIMAL(10, 2)" tableName="stock"/>
+    </changeSet>
+</databaseChangeLog>

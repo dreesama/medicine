@@ -1,6 +1,7 @@
 package com.company.medicine.view.stock;
 
 import com.company.medicine.entity.Stock;
+import com.company.medicine.entity.User;
 import com.company.medicine.service.StockListPdfExportService;
 import com.company.medicine.service.ExcelExportService;
 import com.company.medicine.view.main.MainView;
@@ -9,11 +10,12 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-import io.jmix.flowui.view.*;
 import io.jmix.core.DataManager;
+import io.jmix.core.FetchPlan;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.CollectionContainer;
+import io.jmix.flowui.view.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.ByteArrayInputStream;
@@ -56,7 +58,7 @@ public class StockListView extends StandardListView<Stock> {
     }
 
     private void refreshStockList() {
-        stocksDl.setQuery("select e from Stock e where e.quantity > 0");
+        stocksDl.setQuery("select e from Stock e where e.packageQuantity > 0");
         stocksDl.load();
     }
 
@@ -69,7 +71,8 @@ public class StockListView extends StandardListView<Stock> {
     private void onExportPdfBtnClick() {
         try {
             List<Stock> allStocks = dataManager.load(Stock.class)
-                    .query("select e from Stock e where e.quantity > 0")
+                    .query("select e from Stock e where e.packageQuantity > 0")
+                    .fetchPlan(FetchPlan.BASE)
                     .list();
 
             byte[] pdfBytes = stockListPdfExportService.exportStockListToPdf(allStocks);
@@ -106,7 +109,8 @@ public class StockListView extends StandardListView<Stock> {
     private void onExportExcelBtnClick() {
         try {
             List<Stock> allStocks = dataManager.load(Stock.class)
-                    .query("select e from Stock e where e.quantity > 0")
+                    .query("select e from Stock e where e.packageQuantity > 0")
+                    .fetchPlan(FetchPlan.BASE)
                     .list();
 
             byte[] excelBytes = excelExportService.exportStocksToExcel(allStocks);
@@ -141,7 +145,7 @@ public class StockListView extends StandardListView<Stock> {
     }
 
     public void onQuantityUpdated(Stock stock) {
-        if (stock.getQuantity() <= 0) {
+        if (stock.getPackageQuantity() <= 0) {
             dataManager.remove(stock);
             refreshStockList();
         }

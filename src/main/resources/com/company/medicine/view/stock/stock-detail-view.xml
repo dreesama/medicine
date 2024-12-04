@@ -13,10 +13,10 @@
                     <property name="dosageForm"/>
                     <property name="price"/>
                 </property>
+                <property name="createdBy" fetchPlan="_base"/>
             </fetchPlan>
             <loader id="stockDl"/>
         </instance>
-
         <collection id="medicinesDc"
                     class="com.company.medicine.entity.Medicine">
             <fetchPlan>
@@ -33,7 +33,6 @@
             </loader>
         </collection>
     </data>
-
     <facets>
         <dataLoadCoordinator auto="true"/>
     </facets>
@@ -58,17 +57,22 @@
             <textField id="dosageFormField"
                        property="dosageForm"
                        readOnly="true"/>
-            <textField id="priceField"
-                       property="price"
-                       readOnly="true"/>
-            <textField id="quantityField"
-                       property="quantity" required="true"/>
+            <textField id="pricePerPackageField" property="pricePerPackage"/>
+            <textField id="pricePerUnitField" property="pricePerUnit" visible="false"/>
             <datePicker id="expirationDateField"
                         property="expirationDate" required="true"/>
+            <select id="packageTypeField" property="packageType"/>
+            <select id="unitTypeField" property="unitType"/>
+            <textField id="unitsPerPackageField" property="unitsPerPackage"/>
+            <select id="storageLocationField" property="storageLocation"/>
+            <textField id="packageQuantityField" property="packageQuantity"/>
+            <select id="storageConditionsField" property="storageConditions"/>
+            <textField id="createdByField" property="createdBy.username" readOnly="true"/>  <!--Corrected Line -->
+            <textField id="createdByIdField" property="createdById" visible="false"/>
+            <textField id="totalUnitsField" property="totalUnits" readOnly="true" visible="false"/>
+
         </formLayout>
         <hbox id="detailActions">
-
-
             <button id="saveAndCloseBtn" action="saveAction"/>
             <button id="closeBtn" action="closeAction"/>
         </hbox>

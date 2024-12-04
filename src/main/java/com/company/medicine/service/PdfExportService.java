@@ -70,8 +70,8 @@ public class PdfExportService {
                 addCenteredCell(table, stock.getActiveIngredientName());
                 addCenteredCell(table, stock.getActiveIngredientStrength());
                 addCenteredCell(table, stock.getDosageForm());
-                addCenteredCell(table, String.valueOf(stock.getPrice()));
-                addCenteredCell(table, String.valueOf(stock.getQuantity()));
+                addCenteredCell(table, stock.getPricePerPackage()!= null ? stock.getPricePerPackage().toString() : "");
+                addCenteredCell(table, stock.getPackageQuantity() != null ? stock.getPackageQuantity().toString() : "");
                 // Format the expiration date
                 String formattedDate = formatDate(stock.getExpirationDate());
                 addCenteredCell(table, formattedDate);

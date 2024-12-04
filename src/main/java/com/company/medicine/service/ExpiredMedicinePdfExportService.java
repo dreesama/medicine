@@ -69,8 +69,8 @@ public class ExpiredMedicinePdfExportService {
                 addCenteredCell(table, stock.getActiveIngredientName());
                 addCenteredCell(table, stock.getActiveIngredientStrength());
                 addCenteredCell(table, stock.getDosageForm());
-                addCenteredCell(table, String.valueOf(stock.getPrice()));
-                addCenteredCell(table, String.valueOf(stock.getQuantity()));
+                addCenteredCell(table, stock.getPricePerPackage() != null ? stock.getPricePerPackage().toString() : "");
+                addCenteredCell(table, stock.getPackageQuantity() != null ? stock.getPackageQuantity().toString() : "");
                 String formattedDate = formatDate(stock.getExpirationDate());
                 addCenteredCell(table, formattedDate);
             }
@@ -90,7 +90,7 @@ public class ExpiredMedicinePdfExportService {
     private void addCenteredCell(Table table, String content) {
         Cell cell = new Cell().add(new Paragraph(content));
         cell.setTextAlignment(TextAlignment.CENTER);
-        cell.setVerticalAlignment(com.itextpdf.layout.properties.VerticalAlignment .MIDDLE);
+        cell.setVerticalAlignment(com.itextpdf.layout.properties.VerticalAlignment.MIDDLE);
         table.addCell(cell);
     }
 

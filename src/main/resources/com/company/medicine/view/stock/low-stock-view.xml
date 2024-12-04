@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
       xmlns:c="http://jmix.io/schema/flowui/jpql-condition"
       title="msg://lowStockView.title"
@@ -6,10 +5,12 @@
     <data>
         <collection id="stocksDc"
                     class="com.company.medicine.entity.Stock">
-            <fetchPlan extends="_base"/>
+            <fetchPlan extends="_base">
+                <property name="createdBy" fetchPlan="_base"/>
+            </fetchPlan>
             <loader id="stocksDl" readOnly="true">
                 <query>
-                    <![CDATA[select e from Stock e where e.quantity < 100]]>
+                    <![CDATA[select e from Stock e where e.packageQuantity < 100]]>
                 </query>
             </loader>
         </collection>
@@ -54,9 +55,19 @@
                 <column property="activeIngredientName"/>
                 <column property="activeIngredientStrength"/>
                 <column property="dosageForm"/>
-                <column property="price"/>
-                <column property="quantity"/>
+<!--                <column property="price"/>-->
                 <column property="expirationDate"/>
+                <column property="packageType"/>
+                <column property="unitType"/>
+                <column property="unitsPerPackage"/>
+                <column property="packageQuantity"/>
+<!--                <column property="unitPrice"/>-->
+                <column property="storageLocation"/>
+                <column property="storageConditions"/>
+                <column property="createdBy.username"/>
+                <column property="totalUnits"/>
+                <column property="pricePerPackage"/>
+                <column property="pricePerUnit"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

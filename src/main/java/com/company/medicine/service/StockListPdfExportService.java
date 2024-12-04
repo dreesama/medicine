@@ -116,8 +116,8 @@ public class StockListPdfExportService {
             addCenteredCell(table, stock.getActiveIngredientName());
             addCenteredCell(table, stock.getActiveIngredientStrength());
             addCenteredCell(table, stock.getDosageForm());
-            addCenteredCell(table, String.valueOf(stock.getPrice()));
-            addCenteredCell(table, String.valueOf(stock.getQuantity()));
+            addCenteredCell(table, stock.getPricePerPackage()!= null ? stock.getPricePerPackage().toString() : "");
+            addCenteredCell(table, stock.getPackageQuantity() != null ? stock.getPackageQuantity().toString() : "");
             addCenteredCell(table, formatDate(stock.getExpirationDate()));
         }
     }

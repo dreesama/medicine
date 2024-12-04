@@ -41,7 +41,7 @@ public class MedicineListPdfExportService {
             document.add(new Paragraph("Andres Pharmacy Ormoc").setBold().setFontSize(14).setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph("Brgy. Mabini, Ormoc City, Leyte 6541").setFontSize(FONT_SIZE).setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph(LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM d, yyyy"))).setFontSize(FONT_SIZE).setTextAlignment(TextAlignment.CENTER));
-            document.add(new Paragraph("Medicine List").setBold().setFontSize(12).setTextAlignment(TextAlignment.CENTER).setMarginTop(10));
+            document.add(new Paragraph("Medicine Masterlist").setBold().setFontSize(12).setTextAlignment(TextAlignment.CENTER).setMarginTop(10));
 
             document.add(new Paragraph("Total Medicines: " + medicines.size()).setFontSize(FONT_SIZE));
 

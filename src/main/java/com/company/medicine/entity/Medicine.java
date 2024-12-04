@@ -3,13 +3,11 @@ package com.company.medicine.entity;
 import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import io.jmix.core.metamodel.annotation.Store;
-import io.jmix.data.DdlGeneration;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.DISABLED)
 @JmixEntity
 @Store(name = "medicinedetails")
 @Table(name = "medicine")

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="medicine">
+        <addColumn tableName="stock">
+            <column name="price_per_package" type="DECIMAL(10, 2)"/>
+            <column name="price_per_unit" type="DECIMAL(10, 2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2" author="medicine">
+        <dropColumn columnName="price" tableName="stock"/>
+
+        <dropColumn columnName="unit_price" tableName="stock"/>
+    </changeSet>
+</databaseChangeLog>
