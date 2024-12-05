@@ -8,16 +8,17 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxVariant;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,11 +28,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.Text;
 import io.jmix.core.DataManager;
 import io.jmix.flowui.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -43,17 +46,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.imageio.ImageIO;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.util.List;
+
 import com.vaadin.flow.component.dialog.Dialog;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Base64;
+
+
 @Route(value = "pos", layout = MainView.class)
 @ViewController("PosView")
 @ViewDescriptor("pos-view.xml")
@@ -61,7 +66,9 @@ public class PosView extends StandardView {
 
     @Autowired
     private DataManager dataManager;
-
+    private TextField onlineReferenceField;
+    private TextField cardNumberField;
+    private static final String NUMERIC_PATTERN = "^[0-9]*$";
     private Dialog paymentDialog;
     private Tabs paymentMethodTabs;
     private VerticalLayout paymentContentLayout;
@@ -182,62 +189,144 @@ public class PosView extends StandardView {
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setPadding(false);
         mainLayout.setSpacing(true);
-
-        H4 title = new H4("Point of Sale");
-        title.getStyle()
-                .set("color", "var(--lumo-primary-color)")
-                .set("margin-top", "1em")
-                .set("font-weight", "600");
-
-        HorizontalLayout formLayout = createFormLayout();
-        VerticalLayout receiptLayout = createReceiptLayout();
-
-        mainLayout.add(title, formLayout, receiptLayout);
         mainLayout.setSizeFull();
 
+        // Header with user info and timestamp
+        HorizontalLayout headerLayout = createHeaderLayout();
+        mainLayout.add(headerLayout);
+
+        // Main content layout (two columns)
+        HorizontalLayout mainContentLayout = new HorizontalLayout();
+        mainContentLayout.setWidthFull();
+        mainContentLayout.setSpacing(true);
+
+        // Left column: Form with Medicine Selection and Totals
+        VerticalLayout formLayout = createFormLayout();
+        formLayout.setWidth("30%");
+
+        // Right column: Receipt Grid
+        VerticalLayout receiptLayout = createReceiptLayout();
+        receiptLayout.setWidth("70%");
+
+        mainContentLayout.add(formLayout, receiptLayout);
+        mainLayout.add(mainContentLayout);
         getContent().add(mainLayout);
 
+        // Add columns to receipt grid
         saleTypeColumn = receiptGrid.addColumn(ReceiptItem::getSaleTypeWithQuantity)
                 .setHeader("Sale Type (Quantity)")
                 .setWidth("150px");
         receiptGrid.addColumn(ReceiptItem::getUnitType).setHeader("Unit Type");
     }
 
-    private HorizontalLayout createFormLayout() {
-        HorizontalLayout formLayout = new HorizontalLayout();
+    private HorizontalLayout createHeaderLayout() {
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        headerLayout.setWidthFull();
+        headerLayout.setPadding(true);
+        headerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        headerLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        H3 title = new H3("Hello, " + getCurrentUserFirstName() + "!");
+        headerLayout.add(title);
+        H4 timestamp = new H4(LocalDate.now().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+        headerLayout.add(timestamp);
+        return headerLayout;
+    }
+
+    private VerticalLayout createFormLayout() {
+        VerticalLayout formLayout = new VerticalLayout();
         formLayout.setWidthFull();
-        formLayout.setAlignItems(FlexLayout.Alignment.BASELINE);
-        formLayout.setSpacing(true);
+        formLayout.setSpacing(true); // Adjust spacing as needed
+        formLayout.setPadding(true);
+        formLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH);
+
+        H4 medicineSelectionTitle = new H4("Medicine Selection");
+        medicineSelectionTitle.getStyle().set("margin-bottom", "1rem");
 
         medicineSelect = new ComboBox<>("Select Medicine");
         medicineSelect.setItems(loadAvailableStock());
         medicineSelect.setItemLabelGenerator(stock ->
                 stock.getBrandName() + " - " + stock.getActiveIngredientName() +
                         " (" + stock.getActiveIngredientStrength() + ")");
-        medicineSelect.setWidth("300px");
-        medicineSelect.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        medicineSelect.setWidthFull();
+// Removed: .addThemeVariants(ComboBoxVariant.LUMO_SMALL)
         medicineSelect.setPlaceholder("Choose medicine...");
         medicineSelect.setRequired(true);
+        medicineSelect.addValueChangeListener(event -> {
+            updateQuantityField(event.getValue());
+        });
+
+        // Horizontal Layout for Sale Type and Quantity
+        HorizontalLayout saleTypeQuantityLayout = new HorizontalLayout();
+        saleTypeQuantityLayout.setWidthFull();
+        saleTypeQuantityLayout.setSpacing(true);
+        saleTypeQuantityLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        saleTypeQuantityLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
 
         saleTypeComboBox = new ComboBox<>("Sale Type");
         saleTypeComboBox.setItems("Unit", "Package");
         saleTypeComboBox.setValue("Unit");
-        saleTypeComboBox.setWidth("150px");
-        saleTypeComboBox.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        saleTypeComboBox.setWidthFull();
+// Removed: .addThemeVariants(ComboBoxVariant.LUMO_SMALL)
+        saleTypeComboBox.addValueChangeListener(event -> {
+            updateQuantityField(medicineSelect.getValue());
+            quantityField.setValue(1);
+        });
 
         quantityField = new IntegerField("Quantity");
         quantityField.setValue(1);
         quantityField.setMin(1);
         quantityField.setStepButtonsVisible(true);
-        quantityField.setWidth("150px");
-        quantityField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        quantityField.setWidthFull();
+// Removed: .addThemeVariants(TextFieldVariant.LUMO_SMALL)
+        quantityField.addValueChangeListener(e -> {
+            if (e.getValue() == null || e.getValue() < 1) {
+                quantityField.setValue(1);
+            }
+            if(medicineSelect.getValue() != null){
+                updateQuantityField(medicineSelect.getValue());
+            }
+        });
+
+        saleTypeQuantityLayout.add(saleTypeComboBox, quantityField);
+
 
         addToReceiptButton = new Button("Add to Receipt", VaadinIcon.PLUS.create());
         addToReceiptButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addToReceiptButton.setWidthFull();
         addToReceiptButton.addClickListener(e -> addToReceipt());
 
-        formLayout.add(medicineSelect, saleTypeComboBox, quantityField, addToReceiptButton);
-        formLayout.setFlexGrow(1, medicineSelect);
+
+        // Totals Section
+        VerticalLayout totalsLayout = new VerticalLayout();
+        totalsLayout.setSpacing(true); // Adjust spacing as needed
+        totalsLayout.setPadding(false);
+        totalsLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH);
+
+        H4 totalsTitle = new H4("Sale Summary");
+        totalsTitle.getStyle().set("margin-bottom", "1rem");
+
+        subtotalField = createReadOnlyTextField("Subtotal:");
+        taxField = createReadOnlyTextField("Tax (12%):");
+        totalField = createReadOnlyTextField("Total:");
+        totalField.getStyle().set("font-weight", "bold");
+
+        processButton = new Button("Process Sale", VaadinIcon.CASH.create());
+        processButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        processButton.setWidthFull();
+        processButton.addClickListener(e -> processSale());
+
+        totalsLayout.add(totalsTitle, subtotalField, taxField, totalField, processButton);
+
+        // Combine Medicine Selection and Totals in the Form Layout
+        formLayout.add(
+                medicineSelectionTitle,
+                medicineSelect,
+                saleTypeQuantityLayout,
+                addToReceiptButton,
+                new Hr(),
+                totalsLayout
+        );
 
         return formLayout;
     }
@@ -246,14 +335,15 @@ public class PosView extends StandardView {
         VerticalLayout receiptLayout = new VerticalLayout();
         receiptLayout.setSpacing(false);
         receiptLayout.setPadding(true);
+        receiptLayout.setSizeFull();
 
         H4 receiptTitle = new H4("Receipt");
         receiptTitle.getStyle()
                 .set("color", "var(--lumo-secondary-text-color)")
-                .set("margin-top", "0")
                 .set("margin-bottom", "var(--lumo-space-m)");
 
         receiptGrid = new Grid<>();
+        receiptGrid.setSizeFull();
         receiptGrid.addColumn(ReceiptItem::getMedicineName).setHeader("Medicine").setFlexGrow(2);
 
         Grid.Column<ReceiptItem> quantityColumn = receiptGrid.addColumn(ReceiptItem::getQuantity)
@@ -294,6 +384,7 @@ public class PosView extends StandardView {
             quantityEditor.focus();
         });
 
+        //Removed duplicate summary fields from here
         HorizontalLayout summaryLayout = new HorizontalLayout();
         summaryLayout.setWidthFull();
         summaryLayout.setJustifyContentMode(FlexLayout.JustifyContentMode.END);
@@ -315,7 +406,7 @@ public class PosView extends StandardView {
 
         summaryLayout.add(totalsLayout, processButton);
 
-        receiptLayout.add(receiptTitle, receiptGrid, summaryLayout);
+        receiptLayout.add(receiptTitle, receiptGrid); //Added summaryLayout
         return receiptLayout;
     }
 
@@ -323,8 +414,10 @@ public class PosView extends StandardView {
         TextField field = new TextField(label);
         field.setReadOnly(true);
         field.setValue("₱0.00");
-        field.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        field.setWidth("200px");
+        // Removed: .addThemeVariants(TextFieldVariant.LUMO_SMALL)
+        field.setWidth("100%");
+       // Change to full width instead of fixed 200px
+        // Change to full width instead of fixed 200px
         return field;
     }
 
@@ -348,39 +441,44 @@ public class PosView extends StandardView {
 
         saleTypeComboBox.addValueChangeListener(event -> {
             updateQuantityField(medicineSelect.getValue());
+            quantityField.setValue(1);
         });
     }
 
     private void updateQuantityField(Stock selectedStock) {
-        if (selectedStock != null) {
-            Stock freshStock = dataManager.load(Stock.class)
-                    .id(selectedStock.getId())
-                    .one();
+        if (selectedStock == null) {
+            quantityField.setLabel("Quantity");
+            quantityField.setValue(1);
+            return;
+        }
 
-            if (isStockValid(freshStock)) {
-                String saleType = saleTypeComboBox.getValue();
-                int maxQuantity;
-                String quantityLabel;
+        Stock freshStock = dataManager.load(Stock.class)
+                .id(selectedStock.getId())
+                .one();
 
-                if (saleType.equals("Package")) {
-                    maxQuantity = freshStock.getPackageQuantity();
-                    quantityLabel = String.format("Quantity (%d)", maxQuantity);
-                } else { // saleType.equals("Unit")
-                    maxQuantity = freshStock.getTotalUnits();
-                    quantityLabel = String.format("Quantity (%d)", maxQuantity);
-                }
+        if (isStockValid(freshStock)) {
+            String saleType = saleTypeComboBox.getValue();
+            int maxQuantity;
+            String quantityLabel;
 
-                quantityField.setLabel(quantityLabel);
-                quantityField.setMax(maxQuantity);
-                quantityField.setValue(1); //Reset to 1 after update
-            } else {
-                medicineSelect.setValue(null);
-                quantityField.setValue(1);
-                quantityField.setLabel("Quantity"); //Default Label
+            if (saleType.equals("Package")) {
+                maxQuantity = freshStock.getPackageQuantity();
+                quantityLabel = String.format("Quantity (%d Packages)", maxQuantity);
+            } else { // saleType.equals("Unit")
+                maxQuantity = freshStock.getTotalUnits();
+                quantityLabel = String.format("Quantity (%d Units)", maxQuantity);
             }
+
+            quantityField.setLabel(quantityLabel);
+            quantityField.setMax(maxQuantity);
+//            quantityField.setValue(1);
+        } else {
+            medicineSelect.setValue(null);
+            medicineSelect.getStyle().setFlexGrow("1");
+            quantityField.setValue(1);
+            quantityField.setLabel("Quantity");
         }
     }
-
 
     private boolean isStockValid(Stock stock) {
         if (stock.getTotalUnits() <= 0) {
@@ -427,7 +525,6 @@ public class PosView extends StandardView {
         BigDecimal priceToUse;
         String unitTypeToUse;
 
-
         if (saleType.equals("Unit")) {
             if (quantity > unitsAvailable) {
                 showError("Insufficient stock. Available units: " + unitsAvailable);
@@ -438,8 +535,7 @@ public class PosView extends StandardView {
             quantityToUpdate = quantity;
             priceToUse = freshStock.getPricePerUnit();
             unitTypeToUse = freshStock.getUnitType() != null ? freshStock.getUnitType().toString() : "";
-
-        } else { // saleType.equals("Package")
+        } else {
             if (quantity > freshStock.getPackageQuantity()) {
                 showError("Insufficient stock. Available packages: " + freshStock.getPackageQuantity());
                 return;
@@ -451,8 +547,47 @@ public class PosView extends StandardView {
             unitTypeToUse = freshStock.getPackageType() != null ? freshStock.getPackageType().toString() : "";
         }
 
-        receiptItems.add(new ReceiptItem(selectedStock, quantity, unitsToSell, saleType, priceToUse, unitTypeToUse));
+        Optional<ReceiptItem> existingItem = receiptItems.stream()
+                .filter(item ->
+                        item.getStock().getId().equals(selectedStock.getId()) &&
+                                item.getSaleType().equals(saleType) &&
+                                item.getUnitType().equals(unitTypeToUse) &&
+                                Objects.equals(
+                                        item.getStock().getExpirationDate(),
+                                        selectedStock.getExpirationDate()
+                                )
+                )
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            ReceiptItem item = existingItem.get();
+            int newQuantity = item.getQuantity() + quantityToUpdate;
+
+            if (saleType.equals("Unit")) {
+                if (newQuantity > unitsAvailable) {
+                    showError("Insufficient stock. Available units: " + unitsAvailable);
+                    return;
+                }
+            } else {
+                if (newQuantity > freshStock.getPackageQuantity()) {
+                    showError("Insufficient stock. Available packages: " + freshStock.getPackageQuantity());
+                    return;
+                }
+            }
+
+            item.setQuantity(newQuantity);
+            if (saleType.equals("Unit")) {
+                item.setUnitsSold(newQuantity);
+            } else {
+                item.setUnitsSold(newQuantity * freshStock.getUnitsPerPackage());
+                item.setPackagesSold(newQuantity);
+            }
+        } else {
+            receiptItems.add(new ReceiptItem(selectedStock, quantity, unitsToSell, saleType, priceToUse, unitTypeToUse));
+        }
+
         updateReceipt();
+        quantityField.setValue(1);
         resetSelectionForm();
     }
 
@@ -534,7 +669,6 @@ public class PosView extends StandardView {
             x = (image.getWidth() - metrics.stringWidth(dateTime)) / 2;
             g2d.drawString(dateTime, x, 95);
 
-            // Placeholder for cashier/user name
             String cashierName = getCurrentUserFirstName();
             g2d.drawString("Cashier: " + cashierName, 50, 115);
 
@@ -566,7 +700,6 @@ public class PosView extends StandardView {
             y += 20;
             g2d.drawString(String.format("%-25s %s", "TOTAL:", totalField.getValue()), 50, y);
 
-            // Add payment method details
             y += 40;
             g2d.drawString("Payment Details:", 50, y);
             y += 20;
@@ -619,6 +752,7 @@ public class PosView extends StandardView {
             showError("Export failed: " + e.getMessage());
         }
     }
+
     private void processSale() {
         if (receiptItems.isEmpty()) {
             showError("No items in receipt");
@@ -675,7 +809,6 @@ public class PosView extends StandardView {
     }
 
     private void setupPaymentContent() {
-        // Handle tab changes
         paymentMethodTabs.addSelectedChangeListener(event -> {
             paymentContentLayout.removeAll();
 
@@ -692,7 +825,6 @@ public class PosView extends StandardView {
             }
         });
 
-        // Show first tab content by default
         setupOnlinePaymentContent();
     }
 
@@ -702,11 +834,26 @@ public class PosView extends StandardView {
         onlinePaymentGroup.setItems("GCash", "PayMaya", "GoTyme");
         onlinePaymentGroup.setValue("GCash");
 
-        TextField referenceField = new TextField("Reference Number");
-        referenceField.setWidthFull();
-        referenceField.setRequired(true);
-
-        paymentContentLayout.add(onlinePaymentGroup, referenceField);
+        onlineReferenceField = new TextField("Reference Number");
+        onlineReferenceField.setWidthFull();
+        onlineReferenceField.setRequired(true);
+        onlineReferenceField.setHelperText("Enter numbers only");
+        onlineReferenceField.addValueChangeListener(event -> {
+            String value = event.getValue();
+            if (!value.isEmpty() && !value.matches(NUMERIC_PATTERN)) {
+                onlineReferenceField.setInvalid(true);
+                onlineReferenceField.setErrorMessage("Please enter numbers only");
+                confirmPaymentButton.setEnabled(false);
+            } else if (value.isEmpty()) {
+                onlineReferenceField.setInvalid(true);
+                onlineReferenceField.setErrorMessage("Reference number is required");
+                confirmPaymentButton.setEnabled(false);
+            } else {
+                onlineReferenceField.setInvalid(false);
+                confirmPaymentButton.setEnabled(true);
+            }
+        });
+        paymentContentLayout.add(onlinePaymentGroup, onlineReferenceField);
     }
 
     private void setupCardPaymentContent() {
@@ -715,9 +862,25 @@ public class PosView extends StandardView {
         cardPaymentGroup.setItems("Visa", "BDO");
         cardPaymentGroup.setValue("Visa");
 
-        TextField cardNumberField = new TextField("Card Number");
+        cardNumberField = new TextField("Card Number");
         cardNumberField.setWidthFull();
         cardNumberField.setRequired(true);
+        cardNumberField.setHelperText("Enter numbers only");
+        cardNumberField.addValueChangeListener(event -> {
+            String value = event.getValue();
+            if (!value.isEmpty() && !value.matches(NUMERIC_PATTERN)) {
+                cardNumberField.setInvalid(true);
+                cardNumberField.setErrorMessage("Please enter numbers only");
+                confirmPaymentButton.setEnabled(false);
+            } else if (value.isEmpty()) {
+                cardNumberField.setInvalid(true);
+                cardNumberField.setErrorMessage("Card number is required");
+                confirmPaymentButton.setEnabled(false);
+            } else {
+                cardNumberField.setInvalid(false);
+                confirmPaymentButton.setEnabled(true);
+            }
+        });
 
         paymentContentLayout.add(cardPaymentGroup, cardNumberField);
     }
@@ -728,22 +891,35 @@ public class PosView extends StandardView {
         receivedAmountField = new TextField("Amount Received");
         receivedAmountField.setWidthFull();
         receivedAmountField.setRequired(true);
-        receivedAmountField.addValueChangeListener(event -> {
-            try {
-                String value = event.getValue().replaceAll("[^0-9.]", "");
-                if (!value.isEmpty()) {
-                    BigDecimal received = new BigDecimal(value);
-                    BigDecimal change = received.subtract(totalAmount);
+        receivedAmountField.setHelperText("Enter numbers only");
 
-                    if (change.compareTo(BigDecimal.ZERO) >= 0) {
-                        changeField.setValue(String.format("₱%.2f", change));
-                        confirmPaymentButton.setEnabled(true);
-                    } else {
-                        changeField.setValue("Insufficient amount");
-                        confirmPaymentButton.setEnabled(false);
-                    }
+        receivedAmountField.addValueChangeListener(event -> {
+            String value = event.getValue().replaceAll("[^0-9.]", "");
+
+            if (!event.getValue().equals(value)) {
+                receivedAmountField.setValue(value);
+                receivedAmountField.setErrorMessage("Please enter numbers only");
+                return;
+            }
+
+            try {
+                if (value.isEmpty()) {
+                    changeField.setValue("Enter amount");
+                    confirmPaymentButton.setEnabled(false);
+                    return;
                 }
-            } catch (NumberFormatException | NullPointerException e) {
+
+                BigDecimal received = new BigDecimal(value);
+                BigDecimal change = received.subtract(totalAmount);
+
+                if (change.compareTo(BigDecimal.ZERO) >= 0) {
+                    changeField.setValue(String.format("₱%.2f", change));
+                    confirmPaymentButton.setEnabled(true);
+                } else {
+                    changeField.setValue("Insufficient amount");
+                    confirmPaymentButton.setEnabled(false);
+                }
+            } catch (NumberFormatException e) {
                 changeField.setValue("Invalid amount");
                 confirmPaymentButton.setEnabled(false);
             }
@@ -758,15 +934,22 @@ public class PosView extends StandardView {
     }
 
     private void processPayment() {
+        boolean isValid = validatePaymentInformation();
+        if (!isValid) {
+            return;
+        }
+
         String paymentMethod = "";
         String details = "";
 
         switch (paymentMethodTabs.getSelectedIndex()) {
             case 0:
                 paymentMethod = "Online - " + onlinePaymentGroup.getValue();
+                details = "Reference Number: " + onlineReferenceField.getValue();
                 break;
             case 1:
                 paymentMethod = "Card - " + cardPaymentGroup.getValue();
+                details = "Card Number: " + cardNumberField.getValue();
                 break;
             case 2:
                 paymentMethod = "Cash";
@@ -775,7 +958,6 @@ public class PosView extends StandardView {
                 break;
         }
 
-        // Process the sale (existing logic)
         try {
             for (ReceiptItem item : receiptItems) {
                 Stock stock = dataManager.load(Stock.class)
@@ -812,6 +994,51 @@ public class PosView extends StandardView {
         }
     }
 
+    private boolean validatePaymentInformation() {
+        switch (paymentMethodTabs.getSelectedIndex()) {
+            case 0: // Online Payment
+                if (onlineReferenceField.getValue().isEmpty()) {
+                    showError("Please enter a reference number");
+                    return false;
+                }
+                if (!onlineReferenceField.getValue().matches(NUMERIC_PATTERN)) {
+                    showError("Reference number must contain only numbers");
+                    return false;
+                }
+                break;
+
+            case 1: // Card Payment
+                if (cardNumberField.getValue().isEmpty()) {
+                    showError("Please enter a card number");
+                    return false;
+                }
+                if (!cardNumberField.getValue().matches(NUMERIC_PATTERN)) {
+                    showError("Card number must contain only numbers");
+                    return false;
+                }
+                break;
+
+            case 2: // Cash Payment
+                if (receivedAmountField.getValue().isEmpty()) {
+                    showError("Please enter the received amount");
+                    return false;
+                }
+                try {
+                    BigDecimal received = new BigDecimal(receivedAmountField.getValue());
+                    BigDecimal total = new BigDecimal(totalField.getValue().replace("₱", "").replace(",", ""));
+                    if (received.compareTo(total) < 0) {
+                        showError("Insufficient payment amount");
+                        return false;
+                    }
+                } catch (NumberFormatException e) {
+                    showError("Invalid payment amount");
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
     private List<String> splitLongText(String text, int maxLength) {
         List<String> lines = new ArrayList<>();
         while (text.length() > maxLength) {
@@ -838,8 +1065,8 @@ public class PosView extends StandardView {
         Notification.show(message, 3000, Notification.Position.TOP_CENTER)
                 .addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
+
     private String getCurrentUserFirstName() {
-        // Assuming you're using Spring Security or Jmix's authentication
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User) {
             User currentUser = (User) authentication.getPrincipal();

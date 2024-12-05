@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.itextpdf:itextpdf:5.5.13.3'
     implementation 'io.jmix.flowui:jmix-flowui-starter'
     implementation 'io.jmix.flowui:jmix-flowui-data'
+
     implementation 'io.jmix.flowui:jmix-flowui-themes'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
