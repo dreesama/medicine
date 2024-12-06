@@ -5,13 +5,15 @@ import io.jmix.core.metamodel.annotation.DependsOnProperties;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import io.jmix.core.metamodel.annotation.JmixProperty;
 import io.jmix.core.metamodel.annotation.Store;
+import io.jmix.data.DdlGeneration;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
+@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.CREATE_ONLY)
 @JmixEntity
 @Store(name = "medicinedetails")
 @Table(name = "stock")
@@ -22,61 +24,71 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+    @Column(name = "DATE_ADDED")
+    private LocalDateTime dateAdded;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medicine_id")
     private Medicine medicine;
-
     @Column(name = "brand_name")
     private String brandName;
-
     @Column(name = "active_ingredient_name")
     private String activeIngredientName;
-
     @Column(name = "active_ingredient_strength")
     private String activeIngredientStrength;
-
     @Column(name = "dosage_form")
     private String dosageForm;
-
     @Column(name = "PACKAGE_TYPE")
     private String packageType;
-
     @Column(name = "UNIT_TYPE")
     private String unitType;
-
     @Column(name = "units_per_package")
     private Integer unitsPerPackage;
-
     @Column(name = "package_quantity")
     private Integer packageQuantity;
-
     @Column(name = "price_per_package", precision = 10, scale = 2)
     private BigDecimal pricePerPackage;
-
     @Column(name = "price_per_unit", precision = 10, scale = 2)
     private BigDecimal pricePerUnit;
-
     @Column(name = "total_units")
     private Integer totalUnits;
-
     @Column(name = "expiration_date")
     @Temporal(TemporalType.DATE)
     private Date expirationDate;
-
     @Column(name = "STORAGE_LOCATION")
     private String storageLocation;
-
     @Column(name = "STORAGE_CONDITIONS")
     private String storageConditions;
-
     @SystemLevel
-    @Column(name = "CREATED_BY_ID",updatable = false)
+    @Column(name = "CREATED_BY_ID", updatable = false)
     private UUID createdById;
-
     @DependsOnProperties({"createdById"})
     @JmixProperty
     @Transient
     private User createdBy;
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+    @PrePersist
+    public void setDateAddedOnCreate() {
+        if (this.dateAdded == null) {
+            this.dateAdded = LocalDateTime.now();
+        }
+    }
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
 
     public Integer getTotalUnits() {
         return totalUnits;
@@ -224,6 +236,7 @@ public class Stock {
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
     }
+
 
 //    @PrePersist
 //    @PreUpdate

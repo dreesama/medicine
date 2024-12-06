@@ -77,7 +77,7 @@
                 <column property="activeIngredientName"/>
                 <column property="activeIngredientStrength"/>
                 <column property="dosageForm"/>
-<!--                <column property="price"/>-->
+                <!--                <column property="price"/>-->
                 <column property="expirationDate"/>
                 <column property="packageType"/>
                 <column property="unitType"/>
@@ -85,15 +85,13 @@
                 <column property="pricePerPackage"/>
                 <column property="pricePerUnit"/>
                 <column property="totalUnits"/>
-
-<!--                <column property="unitPrice"/>-->
+                <!--                <column property="unitPrice"/>-->
                 <column property="packageQuantity"/>
                 <column property="storageConditions" visible="false"/>
                 <column property="storageLocation" visible="false"/>
-
                 <column property="createdBy"/>
                 <column property="createdById" visible="false"/>
-
+                <column property="dateAdded"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

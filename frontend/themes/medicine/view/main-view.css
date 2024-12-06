@@ -6,15 +6,19 @@
   height: var(--lumo-size-xl);
   align-items: center;
   width: 100%;
+  /*background-image: url("../../icons/bgMed.png");*/
+  color: var(--lumo-header-text-color);
 }
 
 .jmix-main-view-drawer-toggle {
-  color: var(--lumo-secondary-text-color);
+  color: #2A5E7A;
 }
 
 .jmix-main-view-title {
   margin: 0;
   font-size: var(--lumo-font-size-l);
+  color: #2A5E7A;
+
 }
 
 .jmix-main-view-section {
@@ -23,6 +27,7 @@
   align-items: stretch;
   max-height: 100%;
   min-height: 100%;
+  --navbar-background-color: #2A5E7A;
 }
 
 .jmix-main-view-application-title {

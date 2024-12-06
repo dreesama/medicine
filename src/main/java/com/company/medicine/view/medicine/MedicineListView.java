@@ -24,7 +24,7 @@ import java.util.List;
 @ViewDescriptor("medicine-list-view.xml")
 @LookupComponent("medicinesDataGrid")
 @DialogMode(width = "64em")
-public class MedicineListView extends StandardListView<Medicine> {
+public class  MedicineListView extends StandardListView<Medicine> {
 
     @Autowired
     private MedicineListPdfExportService medicineListPdfExportService;
@@ -48,6 +48,7 @@ public class MedicineListView extends StandardListView<Medicine> {
     public void onInit(InitEvent event) {
         exportPdfBtn.addClickListener(e -> exportToPdf());
         exportExcelBtn.addClickListener(e -> exportToExcel());
+
     }
 
     private List<Medicine> loadAllMedicines() {

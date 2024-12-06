@@ -31,7 +31,7 @@ public class MainView extends StandardMainView {
         Image image = new Image();
 
         // Set image source
-        StreamResource imageResource = new StreamResource("icon.png",
+        StreamResource imageResource = new StreamResource("icons.png",
                 () -> getClass().getResourceAsStream("/META-INF/resources/icons/logo.png"));
         image.setSrc(imageResource);
         image.setAlt("Main Image");

@@ -28,17 +28,19 @@
         <action id="discardAction" type="lookup_discard"/>
     </actions>
     <layout>
+
         <genericFilter id="genericFilter"
                        dataLoader="medicinesDl">
             <properties include=".*"/>
         </genericFilter>
+
         <hbox id="buttonsPanel" classNames="buttons-panel">
             <button id="createBtn" action="medicinesDataGrid.create"/>
             <button id="readBtn" action="medicinesDataGrid.read"/>
             <button id="editBtn" action="medicinesDataGrid.edit"/>
             <button id="removeBtn" action="medicinesDataGrid.remove"/>
-            <button id="exportPdfBtn" text="Export to PDF" icon="vaadin:file"/>
-            <button id="exportExcelBtn" text="Export to Excel" icon="vaadin:file-table"/>
+            <button id="exportPdfBtn" text="PDF" icon="vaadin:file"/>
+            <button id="exportExcelBtn" text="Excel" icon="vaadin:file-table"/>
             <simplePagination id="pagination" dataLoader="medicinesDl"/>
         </hbox>
         <dataGrid id="medicinesDataGrid"

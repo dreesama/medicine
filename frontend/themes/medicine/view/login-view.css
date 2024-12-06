@@ -1,5 +1,28 @@
-/* Predefined styles for the LoginView */
-
 .jmix-login-main-layout {
-  background-color: var(--lumo-shade-5pct);
+  background-image: url("../../icons/bgMed.png");
+  background-size: cover; /* Ensures the image covers the entire container */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-attachment: fixed; /* Keeps the background fixed while scrolling */
+  background-position: center; /* Centers the image */
+  height: 100vh; /* Sets the height to the viewport height */
+}
+
+.jmix-login-form {
+  padding-right: 200px;
+
+  /* Initial state for fade-in effect */
+  opacity: 0;
+
+  /* Applying the fade-in animation */
+  animation: fadeIn 2s ease-in forwards;
+}
+
+/* Keyframes for the fade-in effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

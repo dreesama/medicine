@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://saleItemDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="saleItemDc"
+                  class="com.company.medicine.entity.SaleItem">
+            <fetchPlan extends="_base">
+                <property name="sale" fetchPlan="_base"/>
+                <property name="stock" fetchPlan="_base"/>
+            </fetchPlan>
+            <loader id="saleItemDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="saleItemDc">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1"/>
+                <responsiveStep minWidth="40em" columns="2"/>
+            </responsiveSteps>
+            <entityPicker id="saleField" property="sale">
+                <actions>
+                    <action id="entityLookup" type="entity_lookup"/>
+                    <action id="entityClear" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker id="stockField" property="stock">
+                <actions>
+                    <action id="entityLookup" type="entity_lookup"/>
+                    <action id="entityClear" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <textField id="quantityField" property="quantity"/>
+            <textField id="unitPriceField" property="unitPrice"/>
+            <textField id="totalAmountField" property="totalAmount"/>
+            <textField id="saleTypeField" property="saleType"/>
+        </formLayout>
+        <hbox id="detailActions">
+            <button id="saveAndCloseButton" action="saveAction"/>
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

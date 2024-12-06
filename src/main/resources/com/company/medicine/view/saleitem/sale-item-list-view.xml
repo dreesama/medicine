@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      xmlns:c="http://jmix.io/schema/flowui/jpql-condition"
+      title="msg://saleItemListView.title"
+      focusComponent="saleItemsDataGrid">
+    <data>
+        <collection id="saleItemsDc"
+                    class="com.company.medicine.entity.SaleItem">
+            <fetchPlan extends="_base">
+                <property name="sale" fetchPlan="_base">
+                    <property name="cashier" fetchPlan="_base"/>
+                </property>
+                <property name="stock" fetchPlan="_base"/>
+            </fetchPlan>
+            <loader id="saleItemsDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from SaleItem e]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+        <urlQueryParameters>
+            <genericFilter component="genericFilter"/>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="selectAction" type="lookup_select"/>
+        <action id="discardAction" type="lookup_discard"/>
+    </actions>
+    <layout>
+        <genericFilter id="genericFilter"
+                       dataLoader="saleItemsDl">
+            <properties include=".*"/>
+        </genericFilter>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <button id="createButton" action="saleItemsDataGrid.create"/>
+            <button id="readButton" action="saleItemsDataGrid.read"/>
+            <button id="editButton" action="saleItemsDataGrid.edit"/>
+            <button id="removeButton" action="saleItemsDataGrid.remove"/>
+            <button id="excelExportButton" action="saleItemsDataGrid.excelExport"/>
+            <simplePagination id="pagination" dataLoader="saleItemsDl"/>
+        </hbox>
+        <dataGrid id="saleItemsDataGrid"
+                  width="100%"
+                  minHeight="20em"
+                  dataContainer="saleItemsDc"
+                  columnReorderingAllowed="true">
+            <actions>
+                <action id="create" type="list_create"/>
+                <action id="read" type="list_read"/>
+                <action id="edit" type="list_edit"/>
+                <action id="remove" type="list_remove"/>
+                <action id="excelExport" type="grdexp_excelExport"/>
+            </actions>
+            <columns resizable="true">
+                <column property="sale.cashier.username"/>
+                <column property="stock.brandName"/>
+                <column property="quantity"/>
+                <column property="unitPrice"/>
+                <column property="totalAmount"/>
+                <column property="saleType"/>
+            </columns>
+        </dataGrid>
+        <hbox id="lookupActions" visible="false">
+            <button id="selectButton" action="selectAction"/>
+            <button id="discardButton" action="discardAction"/>
+        </hbox>
+    </layout>
+</view>

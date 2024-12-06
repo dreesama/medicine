@@ -70,7 +70,7 @@
             <textField id="createdByField" property="createdBy.username" readOnly="true"/>  <!--Corrected Line -->
             <textField id="createdByIdField" property="createdById" visible="false"/>
             <textField id="totalUnitsField" property="totalUnits" readOnly="true" visible="false"/>
-
+            <dateTimePicker id="dateAddedField" property="dateAdded" visible="false"/>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseBtn" action="saveAction"/>

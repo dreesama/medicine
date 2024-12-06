@@ -1,13 +1,15 @@
 package com.company.medicine.view.pos;
 
+import com.company.medicine.entity.Sale;
+import com.company.medicine.entity.SaleItem;
 import com.company.medicine.entity.Stock;
 import com.company.medicine.entity.User;
 import com.company.medicine.view.main.MainView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
@@ -25,12 +27,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.Text;
 import io.jmix.core.DataManager;
 import io.jmix.flowui.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -77,7 +78,9 @@ public class PosView extends StandardView {
     private TextField receivedAmountField;
     private RadioButtonGroup<String> onlinePaymentGroup;
     private RadioButtonGroup<String> cardPaymentGroup;
-
+    private Checkbox seniorCitizenCheckbox;
+    private Checkbox pwdCheckbox;
+    private H4 totalHeader;
     private ComboBox<Stock> medicineSelect;
     private ComboBox<String> saleTypeComboBox;
     private IntegerField quantityField;
@@ -187,24 +190,20 @@ public class PosView extends StandardView {
 
     private void initComponents() {
         VerticalLayout mainLayout = new VerticalLayout();
-        mainLayout.setPadding(false);
+        mainLayout.setPadding(true);
         mainLayout.setSpacing(true);
         mainLayout.setSizeFull();
 
-        // Header with user info and timestamp
         HorizontalLayout headerLayout = createHeaderLayout();
         mainLayout.add(headerLayout);
 
-        // Main content layout (two columns)
         HorizontalLayout mainContentLayout = new HorizontalLayout();
         mainContentLayout.setWidthFull();
         mainContentLayout.setSpacing(true);
 
-        // Left column: Form with Medicine Selection and Totals
         VerticalLayout formLayout = createFormLayout();
         formLayout.setWidth("30%");
 
-        // Right column: Receipt Grid
         VerticalLayout receiptLayout = createReceiptLayout();
         receiptLayout.setWidth("70%");
 
@@ -212,7 +211,6 @@ public class PosView extends StandardView {
         mainLayout.add(mainContentLayout);
         getContent().add(mainLayout);
 
-        // Add columns to receipt grid
         saleTypeColumn = receiptGrid.addColumn(ReceiptItem::getSaleTypeWithQuantity)
                 .setHeader("Sale Type (Quantity)")
                 .setWidth("150px");
@@ -235,12 +233,12 @@ public class PosView extends StandardView {
     private VerticalLayout createFormLayout() {
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setWidthFull();
-        formLayout.setSpacing(true); // Adjust spacing as needed
+        formLayout.setSpacing(true);
         formLayout.setPadding(true);
         formLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH);
 
         H4 medicineSelectionTitle = new H4("Medicine Selection");
-        medicineSelectionTitle.getStyle().set("margin-bottom", "1rem");
+        medicineSelectionTitle.getStyle().set("margin-bottom", "0.5rem");
 
         medicineSelect = new ComboBox<>("Select Medicine");
         medicineSelect.setItems(loadAvailableStock());
@@ -248,14 +246,12 @@ public class PosView extends StandardView {
                 stock.getBrandName() + " - " + stock.getActiveIngredientName() +
                         " (" + stock.getActiveIngredientStrength() + ")");
         medicineSelect.setWidthFull();
-// Removed: .addThemeVariants(ComboBoxVariant.LUMO_SMALL)
         medicineSelect.setPlaceholder("Choose medicine...");
         medicineSelect.setRequired(true);
         medicineSelect.addValueChangeListener(event -> {
             updateQuantityField(event.getValue());
         });
 
-        // Horizontal Layout for Sale Type and Quantity
         HorizontalLayout saleTypeQuantityLayout = new HorizontalLayout();
         saleTypeQuantityLayout.setWidthFull();
         saleTypeQuantityLayout.setSpacing(true);
@@ -267,7 +263,6 @@ public class PosView extends StandardView {
         saleTypeComboBox.setItems("Unit", "Package");
         saleTypeComboBox.setValue("Unit");
         saleTypeComboBox.setWidthFull();
-// Removed: .addThemeVariants(ComboBoxVariant.LUMO_SMALL)
         saleTypeComboBox.addValueChangeListener(event -> {
             updateQuantityField(medicineSelect.getValue());
             quantityField.setValue(1);
@@ -278,7 +273,6 @@ public class PosView extends StandardView {
         quantityField.setMin(1);
         quantityField.setStepButtonsVisible(true);
         quantityField.setWidthFull();
-// Removed: .addThemeVariants(TextFieldVariant.LUMO_SMALL)
         quantityField.addValueChangeListener(e -> {
             if (e.getValue() == null || e.getValue() < 1) {
                 quantityField.setValue(1);
@@ -297,14 +291,13 @@ public class PosView extends StandardView {
         addToReceiptButton.addClickListener(e -> addToReceipt());
 
 
-        // Totals Section
         VerticalLayout totalsLayout = new VerticalLayout();
-        totalsLayout.setSpacing(true); // Adjust spacing as needed
+        totalsLayout.setSpacing(true);
         totalsLayout.setPadding(false);
         totalsLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH);
 
         H4 totalsTitle = new H4("Sale Summary");
-        totalsTitle.getStyle().set("margin-bottom", "1rem");
+        totalsTitle.getStyle().set("margin-bottom", "0.5rem");
 
         subtotalField = createReadOnlyTextField("Subtotal:");
         taxField = createReadOnlyTextField("Tax (12%):");
@@ -316,9 +309,9 @@ public class PosView extends StandardView {
         processButton.setWidthFull();
         processButton.addClickListener(e -> processSale());
 
+
         totalsLayout.add(totalsTitle, subtotalField, taxField, totalField, processButton);
 
-        // Combine Medicine Selection and Totals in the Form Layout
         formLayout.add(
                 medicineSelectionTitle,
                 medicineSelect,
@@ -384,29 +377,12 @@ public class PosView extends StandardView {
             quantityEditor.focus();
         });
 
-        //Removed duplicate summary fields from here
-        HorizontalLayout summaryLayout = new HorizontalLayout();
-        summaryLayout.setWidthFull();
-        summaryLayout.setJustifyContentMode(FlexLayout.JustifyContentMode.END);
-
-        VerticalLayout totalsLayout = new VerticalLayout();
-        totalsLayout.setSpacing(false);
-        totalsLayout.setPadding(false);
-
-        subtotalField = createReadOnlyTextField("Subtotal:");
-        taxField = createReadOnlyTextField("Tax (12%):");
-        totalField = createReadOnlyTextField("Total:");
-        totalField.getStyle().set("font-weight", "bold");
-
-        totalsLayout.add(subtotalField, taxField, totalField);
-
         processButton = new Button("Process Sale", VaadinIcon.CASH.create());
         processButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
         processButton.addClickListener(e -> processSale());
 
-        summaryLayout.add(totalsLayout, processButton);
 
-        receiptLayout.add(receiptTitle, receiptGrid); //Added summaryLayout
+        receiptLayout.add(receiptTitle, receiptGrid);
         return receiptLayout;
     }
 
@@ -414,10 +390,7 @@ public class PosView extends StandardView {
         TextField field = new TextField(label);
         field.setReadOnly(true);
         field.setValue("₱0.00");
-        // Removed: .addThemeVariants(TextFieldVariant.LUMO_SMALL)
         field.setWidth("100%");
-       // Change to full width instead of fixed 200px
-        // Change to full width instead of fixed 200px
         return field;
     }
 
@@ -464,14 +437,13 @@ public class PosView extends StandardView {
             if (saleType.equals("Package")) {
                 maxQuantity = freshStock.getPackageQuantity();
                 quantityLabel = String.format("Quantity (%d Packages)", maxQuantity);
-            } else { // saleType.equals("Unit")
+            } else {
                 maxQuantity = freshStock.getTotalUnits();
                 quantityLabel = String.format("Quantity (%d Units)", maxQuantity);
             }
 
             quantityField.setLabel(quantityLabel);
             quantityField.setMax(maxQuantity);
-//            quantityField.setValue(1);
         } else {
             medicineSelect.setValue(null);
             medicineSelect.getStyle().setFlexGrow("1");
@@ -632,7 +604,15 @@ public class PosView extends StandardView {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal tax = subtotal.multiply(new BigDecimal("0.12")).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal total = subtotal.add(tax);
+        BigDecimal preDiscountTotal = subtotal.add(tax); // Calculate total before discount
+
+        BigDecimal discountPercentage = BigDecimal.ZERO;
+        if (seniorCitizenCheckbox != null && (seniorCitizenCheckbox.getValue() || pwdCheckbox.getValue())) {
+            discountPercentage = new BigDecimal("0.10");
+        }
+
+        BigDecimal discountAmount = preDiscountTotal.multiply(discountPercentage).setScale(2, RoundingMode.HALF_UP); // Discount on total
+        BigDecimal total = preDiscountTotal.subtract(discountAmount); // Subtract discount from total
 
         subtotalField.setValue(String.format("₱%.2f", subtotal));
         taxField.setValue(String.format("₱%.2f", tax));
@@ -709,13 +689,13 @@ public class PosView extends StandardView {
             String changeAmount = "N/A";
 
             switch (paymentMethodTabs.getSelectedIndex()) {
-                case 0: // Online Payment
+                case 0:
                     paymentMethod = "Online - " + onlinePaymentGroup.getValue();
                     break;
-                case 1: // Card Payment
+                case 1:
                     paymentMethod = "Card - " + cardPaymentGroup.getValue();
                     break;
-                case 2: // Cash Payment
+                case 2:
                     paymentMethod = "Cash";
                     amountReceived = receivedAmountField.getValue();
                     changeAmount = changeField.getValue();
@@ -770,12 +750,10 @@ public class PosView extends StandardView {
         mainLayout.setPadding(true);
         mainLayout.setSpacing(true);
 
-        // Header with total amount
-        H4 totalHeader = new H4("Total Amount: " + totalField.getValue());
+        totalHeader = new H4("Total Amount: " + totalField.getValue()); // Initialize here
         totalHeader.getStyle().set("margin", "0");
         mainLayout.add(totalHeader);
 
-        // Payment method tabs
         Tab onlineTab = new Tab("Online Payment");
         Tab cardTab = new Tab("Card Payment");
         Tab cashTab = new Tab("Cash Payment");
@@ -786,12 +764,16 @@ public class PosView extends StandardView {
         paymentContentLayout.setSpacing(true);
         paymentContentLayout.setPadding(false);
 
+        seniorCitizenCheckbox = new Checkbox("Senior Citizen (10%)");
+        pwdCheckbox = new Checkbox("PWD (10%)");
+        seniorCitizenCheckbox.addValueChangeListener(event -> applyDiscountIfChecked());
+        pwdCheckbox.addValueChangeListener(event -> applyDiscountIfChecked());
+        paymentContentLayout.add(seniorCitizenCheckbox, pwdCheckbox);
+
         mainLayout.add(paymentMethodTabs, paymentContentLayout);
 
-        // Setup payment content
         setupPaymentContent();
 
-        // Confirmation button
         confirmPaymentButton = new Button("Confirm Payment", event -> processPayment());
         confirmPaymentButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
 
@@ -811,15 +793,16 @@ public class PosView extends StandardView {
     private void setupPaymentContent() {
         paymentMethodTabs.addSelectedChangeListener(event -> {
             paymentContentLayout.removeAll();
+            paymentContentLayout.add(seniorCitizenCheckbox, pwdCheckbox); // Add checkboxes back after removing
 
             switch (paymentMethodTabs.getSelectedIndex()) {
-                case 0: // Online Payment
+                case 0:
                     setupOnlinePaymentContent();
                     break;
-                case 1: // Card Payment
+                case 1:
                     setupCardPaymentContent();
                     break;
-                case 2: // Cash Payment
+                case 2:
                     setupCashPaymentContent();
                     break;
             }
@@ -886,7 +869,7 @@ public class PosView extends StandardView {
     }
 
     private void setupCashPaymentContent() {
-        BigDecimal totalAmount = new BigDecimal(totalField.getValue().replace("₱", "").replace(",", ""));
+        BigDecimal totalAmount = new BigDecimal(totalField.getValue().replaceAll("[^0-9.]", "").trim());
 
         receivedAmountField = new TextField("Amount Received");
         receivedAmountField.setWidthFull();
@@ -912,13 +895,8 @@ public class PosView extends StandardView {
                 BigDecimal received = new BigDecimal(value);
                 BigDecimal change = received.subtract(totalAmount);
 
-                if (change.compareTo(BigDecimal.ZERO) >= 0) {
-                    changeField.setValue(String.format("₱%.2f", change));
-                    confirmPaymentButton.setEnabled(true);
-                } else {
-                    changeField.setValue("Insufficient amount");
-                    confirmPaymentButton.setEnabled(false);
-                }
+                changeField.setValue(String.format("₱%.2f", change));
+                confirmPaymentButton.setEnabled(change.compareTo(BigDecimal.ZERO) >= 0);
             } catch (NumberFormatException e) {
                 changeField.setValue("Invalid amount");
                 confirmPaymentButton.setEnabled(false);
@@ -941,6 +919,7 @@ public class PosView extends StandardView {
 
         String paymentMethod = "";
         String details = "";
+        BigDecimal totalAmount = new BigDecimal(totalField.getValue().replaceAll("[^0-9.]", "").trim());
 
         switch (paymentMethodTabs.getSelectedIndex()) {
             case 0:
@@ -953,19 +932,59 @@ public class PosView extends StandardView {
                 break;
             case 2:
                 paymentMethod = "Cash";
-                BigDecimal received = new BigDecimal(receivedAmountField.getValue());
+                BigDecimal received = new BigDecimal(receivedAmountField.getValue().replaceAll("[^0-9.]", "").trim());
                 details = "Amount Received: ₱" + received + "\nChange: " + changeField.getValue();
                 break;
         }
 
         try {
+            Sale sale = dataManager.create(Sale.class);
+            sale.setSaleDate(LocalDateTime.now());
+            sale.setPaymentMethod(paymentMethod);
+
+            BigDecimal subtotal = receiptItems.stream()
+                    .map(ReceiptItem::getTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal tax = subtotal.multiply(new BigDecimal("0.12")).setScale(2, RoundingMode.HALF_UP);
+            sale.setTaxAmount(tax);
+
+            BigDecimal preDiscountTotal = subtotal.add(tax);
+            BigDecimal discountPercentage = BigDecimal.ZERO;
+            if (seniorCitizenCheckbox.getValue() || pwdCheckbox.getValue()) {
+                discountPercentage = new BigDecimal("0.10");
+            }
+            BigDecimal discountAmount = preDiscountTotal.multiply(discountPercentage).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal total = preDiscountTotal.subtract(discountAmount);
+            sale.setTotalAmount(total);
+            sale.setDiscountAmount(discountAmount);
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof User) {
+                User currentUser = (User) authentication.getPrincipal();
+                sale.setCashier(currentUser); // Correct way to associate the cashier
+            } else {
+                showError("Error: Could not determine the cashier. Please log in.");
+                return;
+            }
+
+            List<SaleItem> saleItemsList = new ArrayList<>();
             for (ReceiptItem item : receiptItems) {
+                SaleItem saleItem = dataManager.create(SaleItem.class);
+                saleItem.setSale(sale);
+                saleItem.setStock(item.getStock());
+                int quantity = item.getSaleType().equals("Unit") ? item.getUnitsSold() : item.getPackagesSold();
+                saleItem.setQuantity(quantity);
+                saleItem.setSaleType(item.getSaleType());
+                saleItem.setUnitPrice(item.getUnitPrice());
+                saleItem.setTotalAmount(item.getTotal());
+                saleItemsList.add(saleItem);
+
+                // Update Stock quantity
                 Stock stock = dataManager.load(Stock.class)
                         .id(item.getStock().getId())
                         .one();
-                String saleType = item.getSaleType();
-
-                if (saleType.equals("Unit")) {
+                if (item.getSaleType().equals("Unit")) {
                     stock.setTotalUnits(stock.getTotalUnits() - item.getUnitsSold());
                     stock.setPackageQuantity(stock.getTotalUnits() / stock.getUnitsPerPackage());
                 } else {
@@ -975,6 +994,8 @@ public class PosView extends StandardView {
                 dataManager.save(stock);
             }
 
+            sale.setSaleItems(saleItemsList);
+            dataManager.save(sale);
             exportToImage();
 
             String successMessage = "Payment processed successfully!\n" +
@@ -991,12 +1012,13 @@ public class PosView extends StandardView {
 
         } catch (Exception e) {
             showError("Error processing payment: " + e.getMessage());
+            e.printStackTrace(); // Remove in production
         }
     }
 
     private boolean validatePaymentInformation() {
         switch (paymentMethodTabs.getSelectedIndex()) {
-            case 0: // Online Payment
+            case 0:
                 if (onlineReferenceField.getValue().isEmpty()) {
                     showError("Please enter a reference number");
                     return false;
@@ -1007,7 +1029,7 @@ public class PosView extends StandardView {
                 }
                 break;
 
-            case 1: // Card Payment
+            case 1:
                 if (cardNumberField.getValue().isEmpty()) {
                     showError("Please enter a card number");
                     return false;
@@ -1018,14 +1040,14 @@ public class PosView extends StandardView {
                 }
                 break;
 
-            case 2: // Cash Payment
+            case 2:
                 if (receivedAmountField.getValue().isEmpty()) {
                     showError("Please enter the received amount");
                     return false;
                 }
                 try {
-                    BigDecimal received = new BigDecimal(receivedAmountField.getValue());
-                    BigDecimal total = new BigDecimal(totalField.getValue().replace("₱", "").replace(",", ""));
+                    BigDecimal received = new BigDecimal(receivedAmountField.getValue().replaceAll("[^0-9.]", "").trim());
+                    BigDecimal total = new BigDecimal(totalField.getValue().replaceAll("[^0-9.]", "").trim());
                     if (received.compareTo(total) < 0) {
                         showError("Insufficient payment amount");
                         return false;
@@ -1074,4 +1096,13 @@ public class PosView extends StandardView {
         }
         return "Unknown";
     }
+
+    private void applyDiscountIfChecked() {
+        updateReceipt();
+        // Update the totalHeader in the payment dialog
+        if (paymentDialog != null && paymentDialog.isOpened()) {
+            totalHeader.setText("Total Amount: " + totalField.getValue());
+        }
+    }
+
 }
