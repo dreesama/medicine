@@ -1,12 +1,9 @@
 package com.company.medicine.entity;
 
+import io.jmix.core.DeletePolicy;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
-import io.jmix.core.entity.annotation.SystemLevel;
-import io.jmix.core.metamodel.annotation.DependsOnProperties;
+import io.jmix.core.entity.annotation.OnDeleteInverse;
 import io.jmix.core.metamodel.annotation.JmixEntity;
-import io.jmix.core.metamodel.annotation.JmixProperty;
-import io.jmix.core.metamodel.annotation.Store;
-import io.jmix.data.DdlGeneration;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -15,11 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.CREATE_ONLY)
-@Store(name = "medicinedetails")
 @JmixEntity
 @Table(name = "SALE", indexes = {
-        @Index(name = "IDX_SALE_CASHIER", columnList = "cashier_id")
+        @Index(name = "IDX_SALE_CASHIER", columnList = "CASHIER_ID")
 })
 
 @Entity
@@ -39,20 +34,24 @@ public class Sale {
     @Column(name = "PAYMENT_METHOD")
     private String paymentMethod;
 
-    @SystemLevel
-    @Column(name = "CASHIER_ID")
-    private UUID cashierId;
-
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SaleItem> saleItems = new ArrayList<>();
     @Column(name = "DISCOUNT_AMOUNT", precision = 19, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
     @Column(name = "TAX_AMOUNT", precision = 19, scale = 2)
     private BigDecimal taxAmount = BigDecimal.ZERO;
-    @DependsOnProperties({"cashierId"})
-    @JmixProperty
-    @Transient
+    @OnDeleteInverse(DeletePolicy.UNLINK)
+    @JoinColumn(name = "CASHIER_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
     private User cashier;
+
+    public User getCashier() {
+        return cashier;
+    }
+
+    public void setCashier(User cashier) {
+        this.cashier = cashier;
+    }
 
 
     // Getters and setters for all fields
@@ -79,22 +78,6 @@ public class Sale {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
-    }
-
-    public UUID getCashierId() {
-        return cashierId;
-    }
-
-    public void setCashierId(UUID cashierId) {
-        this.cashierId = cashierId;
-    }
-
-    public User getCashier() {
-        return cashier;
-    }
-
-    public void setCashier(User cashier) {
-        this.cashier = cashier;
     }
 
     public UUID getId() {
@@ -128,4 +111,6 @@ public class Sale {
     public void setTaxAmount(BigDecimal taxAmount) {
         this.taxAmount = taxAmount;
     }
+
+
 }

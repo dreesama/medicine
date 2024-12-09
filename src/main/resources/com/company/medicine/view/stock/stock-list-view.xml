@@ -46,6 +46,8 @@
             <button id="removeBtn" action="stocksDataGrid.remove"/>
             <button id="exportPdfBtn" text="Export to PDF" icon="vaadin:file"/>
             <button id="exportExcelBtn" text="Export to Excel" icon="vaadin:file-table"/>
+            <button id="excelExportButton" action="stocksDataGrid.excelExport"/>
+
             <simplePagination id="pagination" dataLoader="stocksDl"/>
         </hbox>
         <dataGrid id="stocksDataGrid"
@@ -70,6 +72,7 @@
                     </properties>
                 </action>
                 <action id="remove" type="list_remove"/>
+                <action id="excelExport" type="grdexp_excelExport"/>
             </actions>
             <columns resizable="true">
                 <column property="medicine" visible="false"/>
@@ -89,9 +92,8 @@
                 <column property="packageQuantity"/>
                 <column property="storageConditions" visible="false"/>
                 <column property="storageLocation" visible="false"/>
-                <column property="createdBy"/>
-                <column property="createdById" visible="false"/>
                 <column property="dateAdded"/>
+                <column property="createdBy"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

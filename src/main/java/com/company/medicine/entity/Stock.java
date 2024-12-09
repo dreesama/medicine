@@ -1,31 +1,27 @@
 package com.company.medicine.entity;
 
-import io.jmix.core.entity.annotation.SystemLevel;
-import io.jmix.core.metamodel.annotation.DependsOnProperties;
+import io.jmix.core.DeletePolicy;
+import io.jmix.core.entity.annotation.OnDeleteInverse;
 import io.jmix.core.metamodel.annotation.JmixEntity;
-import io.jmix.core.metamodel.annotation.JmixProperty;
-import io.jmix.core.metamodel.annotation.Store;
-import io.jmix.data.DdlGeneration;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
 
-@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.CREATE_ONLY)
 @JmixEntity
-@Store(name = "medicinedetails")
-@Table(name = "stock")
+@Table(name = "stock", indexes = {
+        @Index(name = "IDX_STOCK_CREATED_BY", columnList = "CREATED_BY_ID")
+})
 @Entity
 public class Stock {
+
     @Column(name = "ID", nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @OnDeleteInverse(DeletePolicy.UNLINK)
     private Integer id;
 
-    @Column(name = "deleted")
-    private Boolean deleted = false;
     @Column(name = "DATE_ADDED")
     private LocalDateTime dateAdded;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,13 +56,18 @@ public class Stock {
     private String storageLocation;
     @Column(name = "STORAGE_CONDITIONS")
     private String storageConditions;
-    @SystemLevel
-    @Column(name = "CREATED_BY_ID", updatable = false)
-    private UUID createdById;
-    @DependsOnProperties({"createdById"})
-    @JmixProperty
-    @Transient
+    @OnDeleteInverse(DeletePolicy.UNLINK)
+    @JoinColumn(name = "CREATED_BY_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public LocalDateTime getDateAdded() {
         return dateAdded;
@@ -81,13 +82,6 @@ public class Stock {
             this.dateAdded = LocalDateTime.now();
         }
     }
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
 
 
     public Integer getTotalUnits() {
@@ -96,23 +90,6 @@ public class Stock {
 
     public void setTotalUnits(Integer totalUnits) {
         this.totalUnits = totalUnits;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-        this.createdById = createdBy != null ? createdBy.getId() : null;
-    }
-
-    public UUID getCreatedById() {
-        return createdById;
-    }
-
-    public void setCreatedById(UUID createdById) {
-        this.createdById = createdById;
     }
 
 

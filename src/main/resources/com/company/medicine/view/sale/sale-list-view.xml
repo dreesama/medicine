@@ -41,6 +41,10 @@
             <button id="excelExportButton" action="salesDataGrid.excelExport"/>
             <simplePagination id="pagination" dataLoader="salesDl"/>
         </hbox>
+        <hbox id="totalPanel" classNames="total-panel" alignItems="CENTER" justifyContent="END">
+            <span id="totalLabel" text="Total Sales Amount: "/>
+            <span id="totalAmountLabel"/>
+        </hbox>
         <dataGrid id="salesDataGrid"
                   width="100%"
                   minHeight="20em"

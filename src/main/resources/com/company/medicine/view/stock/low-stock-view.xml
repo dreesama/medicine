@@ -64,11 +64,11 @@
                 <!--                <column property="unitPrice"/>-->
                 <column property="storageLocation"/>
                 <column property="storageConditions"/>
-                <column property="createdBy.username"/>
                 <column property="totalUnits"/>
                 <column property="pricePerPackage"/>
                 <column property="pricePerUnit"/>
                 <column property="dateAdded"/>
+                <column property="createdBy"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

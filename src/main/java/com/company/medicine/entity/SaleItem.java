@@ -2,16 +2,14 @@ package com.company.medicine.entity;
 
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
-import io.jmix.core.metamodel.annotation.Store;
 import io.jmix.data.DdlGeneration;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.CREATE_ONLY)
+@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.DISABLED)
 @JmixEntity
-@Store(name = "medicinedetails")
 @Table(name = "SALE_ITEM")
 @Entity
 public class SaleItem {

@@ -67,10 +67,15 @@
             <select id="storageLocationField" property="storageLocation"/>
             <textField id="packageQuantityField" property="packageQuantity"/>
             <select id="storageConditionsField" property="storageConditions"/>
-            <textField id="createdByField" property="createdBy.username" readOnly="true"/>  <!--Corrected Line -->
-            <textField id="createdByIdField" property="createdById" visible="false"/>
+            <!--Corrected Line -->
             <textField id="totalUnitsField" property="totalUnits" readOnly="true" visible="false"/>
             <dateTimePicker id="dateAddedField" property="dateAdded" visible="false"/>
+            <entityPicker id="createdByField" property="createdBy">
+                <actions>
+                    <action id="entityLookup" type="entity_lookup"/>
+                    <action id="entityClear" type="entity_clear"/>
+                </actions>
+            </entityPicker>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseBtn" action="saveAction"/>

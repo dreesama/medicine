@@ -40,8 +40,10 @@
             <button id="editBtn" action="medicinesDataGrid.edit"/>
             <button id="removeBtn" action="medicinesDataGrid.remove"/>
             <button id="exportPdfBtn" text="PDF" icon="vaadin:file"/>
-            <button id="exportExcelBtn" text="Excel" icon="vaadin:file-table"/>
+<!--            <button id="exportExcelBtn" text="Excel" icon="vaadin:file-table"/>-->
+            <button id="excelExportButton" action="medicinesDataGrid.excelExport"/>
             <simplePagination id="pagination" dataLoader="medicinesDl"/>
+
         </hbox>
         <dataGrid id="medicinesDataGrid"
                   width="100%"
@@ -65,6 +67,9 @@
                         <property name="openMode" value="DIALOG"/>
                     </properties>
                 </action>
+                <action id="excelExport" type="grdexp_excelExport"/>
+
+
             </actions>
             <columns resizable="true">
                 <column property="brandName"/>

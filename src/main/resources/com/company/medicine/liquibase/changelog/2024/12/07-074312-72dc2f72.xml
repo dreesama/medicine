@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="medicine">
+        <createTable tableName="SALE">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_SALE"/>
+            </column>
+            <column name="SALE_DATE" type="DATETIME"/>
+            <column name="TOTAL_AMOUNT" type="DECIMAL(19, 2)"/>
+            <column name="PAYMENT_METHOD" type="VARCHAR(255)"/>
+            <column name="CASHIER_ID" type="UUID"/>
+            <column name="DISCOUNT_AMOUNT" type="DECIMAL(19, 2)"/>
+            <column name="TAX_AMOUNT" type="DECIMAL(19, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="medicine">
+        <createTable tableName="SALE_ITEM">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_SALE_ITEM"/>
+            </column>
+            <column name="SALE_ID" type="UUID"/>
+            <column name="STOCK_ID" type="INT"/>
+            <column name="QUANTITY" type="INT"/>
+            <column name="UNIT_PRICE" type="DECIMAL(19, 2)"/>
+            <column name="TOTAL_AMOUNT" type="DECIMAL(19, 2)"/>
+            <column name="SALE_TYPE" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="medicine">
+        <createTable tableName="medicine">
+            <column autoIncrement="true" name="id" startWith="1" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_MEDICINE"/>
+            </column>
+            <column name="active_ingredient_name" type="VARCHAR(255)"/>
+            <column name="active_ingredient_strength" type="VARCHAR(20)"/>
+            <column name="application_docs_id" type="VARCHAR(20)"/>
+            <column name="application_docs_date" type="DATE"/>
+            <column name="application_docs_type" type="VARCHAR(50)"/>
+            <column name="application_docs_url" type="VARCHAR(255)"/>
+            <column name="application_number" type="VARCHAR(50)"/>
+            <column name="brand_name" type="VARCHAR(255)"/>
+            <column name="dosage_form" type="VARCHAR(100)"/>
+            <column name="marketing_status" type="VARCHAR(50)"/>
+            <column name="price" type="DECIMAL(10, 2)"/>
+            <column name="product_number" type="VARCHAR(50)"/>
+            <column name="reference_drug" type="BOOLEAN"/>
+            <column name="reference_standard" type="BOOLEAN"/>
+            <column name="review_priority" type="VARCHAR(20)"/>
+            <column name="route" type="VARCHAR(50)"/>
+            <column name="sponsor_name" type="VARCHAR(100)"/>
+            <column name="submission_class_code_description" type="VARCHAR(255)"/>
+            <column name="submission_number" type="VARCHAR(50)"/>
+            <column name="submission_status" type="VARCHAR(20)"/>
+            <column name="submission_status_date" type="DATE"/>
+            <column name="submission_type" type="VARCHAR(50)"/>
+            <column name="te_code" type="VARCHAR(10)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="4" author="medicine">
+        <createTable tableName="stock">
+            <column autoIncrement="true" name="ID" startWith="1" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STOCK"/>
+            </column>
+            <column name="DATE_ADDED" type="DATETIME"/>
+            <column name="medicine_id" type="INT"/>
+            <column name="brand_name" type="VARCHAR(255)"/>
+            <column name="active_ingredient_name" type="VARCHAR(255)"/>
+            <column name="active_ingredient_strength" type="VARCHAR(255)"/>
+            <column name="dosage_form" type="VARCHAR(255)"/>
+            <column name="PACKAGE_TYPE" type="VARCHAR(255)"/>
+            <column name="UNIT_TYPE" type="VARCHAR(255)"/>
+            <column name="units_per_package" type="INT"/>
+            <column name="package_quantity" type="INT"/>
+            <column name="price_per_package" type="DECIMAL(10, 2)"/>
+            <column name="price_per_unit" type="DECIMAL(10, 2)"/>
+            <column name="total_units" type="INT"/>
+            <column name="expiration_date" type="DATE"/>
+            <column name="STORAGE_LOCATION" type="VARCHAR(255)"/>
+            <column name="STORAGE_CONDITIONS" type="VARCHAR(255)"/>
+            <column name="CREATED_BY_ID" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="5" author="medicine">
+        <createIndex indexName="IDX_SALE_CASHIER" tableName="SALE">
+            <column name="CASHIER_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="6" author="medicine">
+        <addForeignKeyConstraint baseColumnNames="SALE_ID" baseTableName="SALE_ITEM"
+                                 constraintName="FK_SALE_ITEM_ON_SALE" referencedColumnNames="ID"
+                                 referencedTableName="SALE"/>
+    </changeSet>
+    <changeSet id="7" author="medicine">
+        <addForeignKeyConstraint baseColumnNames="STOCK_ID" baseTableName="SALE_ITEM"
+                                 constraintName="FK_SALE_ITEM_ON_STOCK" referencedColumnNames="ID"
+                                 referencedTableName="stock"/>
+    </changeSet>
+    <changeSet id="8" author="medicine">
+        <addForeignKeyConstraint baseColumnNames="medicine_id" baseTableName="stock"
+                                 constraintName="FK_STOCK_ON_MEDICINE" referencedColumnNames="id"
+                                 referencedTableName="medicine"/>
+    </changeSet>
+</databaseChangeLog>

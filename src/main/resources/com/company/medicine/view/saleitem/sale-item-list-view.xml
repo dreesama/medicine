@@ -8,7 +8,6 @@
                     class="com.company.medicine.entity.SaleItem">
             <fetchPlan extends="_base">
                 <property name="sale" fetchPlan="_base">
-                    <property name="cashier" fetchPlan="_base"/>
                 </property>
                 <property name="stock" fetchPlan="_base"/>
             </fetchPlan>
@@ -56,7 +55,6 @@
                 <action id="excelExport" type="grdexp_excelExport"/>
             </actions>
             <columns resizable="true">
-                <column property="sale.cashier.username"/>
                 <column property="stock.brandName"/>
                 <column property="quantity"/>
                 <column property="unitPrice"/>
