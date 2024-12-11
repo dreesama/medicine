@@ -1,11 +1,11 @@
-.jmix-login-main-layout {
-  background-image: url("../../icons/bgMed.png");
-  background-size: cover; /* Ensures the image covers the entire container */
-  background-repeat: no-repeat; /* Prevents the image from repeating */
-  background-attachment: fixed; /* Keeps the background fixed while scrolling */
-  background-position: center; /* Centers the image */
-  height: 100vh; /* Sets the height to the viewport height */
-}
+  .jmix-login-main-layout {
+    background-image: url("../../icons/bgMed.png");
+    background-size: cover; /* Ensures the image covers the entire container */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-attachment: fixed; /* Keeps the background fixed while scrolling */
+    background-position: center; /* Centers the image */
+    height: 100vh; /* Sets the height to the viewport height */
+  }
 
 .jmix-login-form {
   padding-right: 200px;

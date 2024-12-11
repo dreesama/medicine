@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="medicine">
+        <dropForeignKeyConstraint baseTableName="report_execution" constraintName="fk_report_exec_to_report"/>
+    </changeSet>
+    <changeSet id="2" author="medicine">
+        <dropForeignKeyConstraint baseTableName="report_template" constraintName="fk_report_template_to_report"/>
+    </changeSet>
+    <changeSet id="3" author="medicine">
+        <dropForeignKeyConstraint baseTableName="report_report" constraintName="fk_report_to_def_template"/>
+    </changeSet>
+    <changeSet id="4" author="medicine">
+        <dropForeignKeyConstraint baseTableName="report_report" constraintName="fk_report_to_report_group"/>
+    </changeSet>
+    <changeSet id="5" author="medicine">
+        <dropForeignKeyConstraint baseTableName="stock" constraintName="FK_STOCK_ON_MEDICINE"/>
+    </changeSet>
+    <changeSet id="6" author="medicine">
+        <dropTable cascadeConstraints="true" tableName="report_execution"/>
+    </changeSet>
+    <changeSet id="7" author="medicine">
+        <dropTable cascadeConstraints="true" tableName="report_group"/>
+    </changeSet>
+    <changeSet id="8" author="medicine">
+        <dropTable cascadeConstraints="true" tableName="report_report"/>
+    </changeSet>
+    <changeSet id="9" author="medicine">
+        <dropTable cascadeConstraints="true" tableName="report_template"/>
+    </changeSet>
+    <changeSet id="10" author="medicine">
+        <addForeignKeyConstraint baseColumnNames="medicine_id" baseTableName="stock"
+                                 constraintName="FK_STOCK_ON_MEDICINE" onDelete="SET NULL" referencedColumnNames="id"
+                                 referencedTableName="medicine"/>
+    </changeSet>
+</databaseChangeLog>

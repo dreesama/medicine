@@ -30,7 +30,7 @@
     <layout>
 
         <genericFilter id="genericFilter"
-                       dataLoader="medicinesDl">
+                       dataLoader="medicinesDl" visible="false" enabled="false">
             <properties include=".*"/>
         </genericFilter>
 
@@ -72,30 +72,30 @@
 
             </actions>
             <columns resizable="true">
-                <column property="brandName"/>
-                <column property="reviewPriority"/>
-                <column property="applicationNumber" visible="false"/>
-                <column property="activeIngredientName"/>
-                <column property="activeIngredientStrength"/>
-                <column property="applicationDocs" visible="false"/>
-                <column property="applicationDocsDate"/>
-                <column property="applicationDocsType" visible="false"/>
-                <column property="applicationDocsUrl" visible="false"/>
-                <column property="dosageForm"/>
-                <column property="marketingStatus"/>
-                <column property="productNumber" visible="false"/>
-                <column property="referenceDrug" visible="false"/>
-                <column property="referenceStandard" visible="false"/>
-                <column property="route"/>
-                <column property="sponsorName" visible="false"/>
-                <column property="submissionClassCodeDescription" visible="false"/>
-                <column property="submissionNumber" visible="false"/>
-                <column property="submissionStatus" visible="false"/>
-                <column property="submissionStatusDate" visible="false"/>
-                <column property="submissionType" visible="false"/>
-                <column property="teCode" visible="false"/>
-                <column property="id" visible="false"/>
-                <column property="price"/>
+                <column property="brandName" filterable="true"/>
+                <column property="reviewPriority" filterable="true"/>
+                <column property="applicationNumber" visible="false" filterable="true"/>
+                <column property="activeIngredientName" filterable="true"/>
+                <column property="activeIngredientStrength" filterable="true"/>
+                <column property="applicationDocs" visible="false" filterable="true"/>
+                <column property="applicationDocsDate" filterable="true"/>
+                <column property="applicationDocsType" visible="false" filterable="true"/>
+                <column property="applicationDocsUrl" visible="false" filterable="true"/>
+                <column property="dosageForm" filterable="true"/>
+                <column property="marketingStatus" filterable="true"/>
+                <column property="productNumber" visible="false" filterable="true"/>
+                <column property="referenceDrug" visible="false" filterable="true"/>
+                <column property="referenceStandard" visible="false" filterable="true"/>
+                <column property="route" filterable="true"/>
+                <column property="sponsorName" visible="false" filterable="true"/>
+                <column property="submissionClassCodeDescription" visible="false" filterable="true"/>
+                <column property="submissionNumber" visible="false" filterable="true"/>
+                <column property="submissionStatus" visible="false" filterable="true"/>
+                <column property="submissionStatusDate" visible="false" filterable="true"/>
+                <column property="submissionType" visible="false" filterable="true"/>
+                <column property="teCode" visible="false" filterable="true"/>
+                <column property="id" visible="false" filterable="true"/>
+                <column property="price" filterable="true"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

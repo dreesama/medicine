@@ -26,7 +26,7 @@
     </facets>
     <layout>
         <genericFilter id="genericFilter"
-                       dataLoader="usersDl">
+                       dataLoader="usersDl" visible="false" enabled="false">
             <properties include=".*"/>
         </genericFilter>
         <hbox id="buttonsPanel" classNames="buttons-panel">
@@ -58,12 +58,12 @@
                 <action id="showUserSubstitutions" type="sec_showUserSubstitutions"/>
             </actions>
             <columns resizable="true">
-                <column property="username"/>
-                <column property="firstName"/>
-                <column property="lastName"/>
-                <column property="email"/>
-                <column property="timeZoneId"/>
-                <column property="active"/>
+                <column property="username" filterable="true"/>
+                <column property="firstName" filterable="true"/>
+                <column property="lastName" filterable="true"/>
+                <column property="email" filterable="true"/>
+                <column property="timeZoneId" filterable="true"/>
+                <column property="active" filterable="true"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

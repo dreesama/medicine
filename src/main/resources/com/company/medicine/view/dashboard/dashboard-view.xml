@@ -1,72 +1,157 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<view xmlns="http://jmix.io/schema/flowui/view"
-      xmlns:charts="http://jmix.io/schema/charts/ui"
-      title="msg://dashboardView.title">
-    <layout spacing="true" padding="true">
-        <hBox spacing="true" width="100%" height="200px">
-            <!-- Out of Stock -->
-            <vBox stylename="card"
-                  width="25%"
-                  height="100%"
-                  spacing="true"
-                  padding="true"
-                  alignItems="center"
-                  backgroundColor="var(--lumo-error-color-10)">
-                <label value="Out of Stock"
-                       stylename="bold large"/>
-                <label id="outOfStockCount"
-                       stylename="bold h1"/>
-                <label value="Items"
-                       stylename="helper"/>
-            </vBox>
+<view xmlns="http://jmix.io/schema/flowui/view" xmlns:pvttbl="http://jmix.io/schema/pvttbl/ui" title="msg://dashboardView.title">
+    <data>
+        <!-- All Stocks -->
+        <collection id="stocksDc" class="com.company.medicine.entity.Stock">
+            <loader id="stocksDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from Stock e]]>
+                </query>
+            </loader>
+            <fetchPlan extends="_base"/>
+        </collection>
 
-            <!-- Low Stock -->
-            <vBox stylename="card"
-                  width="25%"
-                  height="100%"
-                  spacing="true"
-                  padding="true"
-                  alignItems="center"
-                  backgroundColor="var(--lumo-warning-color-10)">
-                <label value="Low Stock"
-                       stylename="bold large"/>
-                <label id="lowStockCount"
-                       stylename="bold h1"/>
-                <label value="Items"
-                       stylename="helper"/>
-            </vBox>
+        <!-- Expiring Soon -->
+        <collection id="expiringSoonDc" class="com.company.medicine.entity.Stock">
+            <loader id="expiringSoonDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from Stock e where e.expirationDate <= :endDate]]>
+                </query>
+            </loader>
+            <fetchPlan extends="_base"/>
+        </collection>
 
-            <!-- Expiring Soon -->
-            <vBox stylename="card"
-                  width="25%"
-                  height="100%"
-                  spacing="true"
-                  padding="true"
-                  alignItems="center"
-                  backgroundColor="var(--lumo-primary-color-10)">
-                <label value="Expiring Soon"
-                       stylename="bold large"/>
-                <label id="expiringSoonCount"
-                       stylename="bold h1"/>
-                <label value="Items"
-                       stylename="helper"/>
-            </vBox>
+        <!-- Expired -->
+        <collection id="expiredDc" class="com.company.medicine.entity.Stock">
+            <loader id="expiredDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from Stock e where e.expirationDate < CURRENT_DATE]]>
+                </query>
+            </loader>
+            <fetchPlan extends="_base"/>
+        </collection>
 
-            <!-- Expired -->
-            <vBox stylename="card"
-                  width="25%"
-                  height="100%"
-                  spacing="true"
-                  padding="true"
-                  alignItems="center"
-                  backgroundColor="var(--lumo-error-color-10)">
-                <label value="Expired"
-                       stylename="bold large"/>
-                <label id="expiredCount"
-                       stylename="bold h1"/>
-                <label value="Items"
-                       stylename="helper"/>
-            </vBox>
-        </hBox>
+        <!-- Low Stock -->
+        <collection id="lowStockDc" class="com.company.medicine.entity.Stock">
+            <loader id="lowStockDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from Stock e where e.packageQuantity < 100]]>
+                </query>
+            </loader>
+            <fetchPlan extends="_base"/>
+        </collection>
+
+        <!-- Out of Stock -->
+        <collection id="outOfStockDc" class="com.company.medicine.entity.Stock">
+            <loader id="outOfStockDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from Stock e where e.packageQuantity = 0]]>
+                </query>
+            </loader>
+            <fetchPlan extends="_base"/>
+        </collection>
+    </data>
+
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+
+    <layout spacing="true">
+        <!-- All Stocks Pivot -->
+            <pvttbl:pivotTable id="allStocksPivotTable" dataContainer="stocksDc"
+                               showUI="true" height="400px" width="100%"
+                               showColumnTotals="true" showRowTotals="true">
+                <pvttbl:properties>
+                    <pvttbl:property name="totalUnits"/>
+
+                    <pvttbl:property name="brandName"/>
+                    <pvttbl:property name="activeIngredientName"/>
+                    <pvttbl:property name="activeIngredientStrength"/>
+                    <pvttbl:property name="unitsPerPackage"/>
+                    <pvttbl:property name="dosageForm"/>
+                    <pvttbl:property name="packageQuantity"/>
+                    <pvttbl:property name="pricePerPackage"/>
+                    <pvttbl:property name="pricePerUnit"/>
+                    <pvttbl:property name="dateAdded"/>
+                    <pvttbl:property name="expirationDate"/>
+                    <pvttbl:property name="createdBy.username"/>
+                </pvttbl:properties>
+                <pvttbl:rows>
+                    <pvttbl:row value="brandName"/>
+                    <pvttbl:row value="totalUnits"/>
+
+                    <pvttbl:row value="activeIngredientName"/>
+                    <pvttbl:row value="packageQuantity"/>
+                    <pvttbl:row value="expirationDate"/>
+                </pvttbl:rows>
+            </pvttbl:pivotTable>
+
+<!--        &lt;!&ndash; Expiring Soon Pivot &ndash;&gt;-->
+<!--            <pvttbl:pivotTable id="expiringSoonPivotTable" dataContainer="expiringSoonDc"-->
+<!--                               showUI="true" height="400px" width="100%"-->
+<!--                               showColumnTotals="true" showRowTotals="true">-->
+<!--                <pvttbl:properties>-->
+<!--                    <pvttbl:property name="brandName"/>-->
+<!--                    <pvttbl:property name="expirationDate"/>-->
+<!--                    <pvttbl:property name="packageQuantity"/>-->
+<!--                    <pvttbl:property name="pricePerPackage"/>-->
+<!--                </pvttbl:properties>-->
+<!--                <pvttbl:rows>-->
+<!--                    <pvttbl:row value="brandName"/>-->
+<!--                    <pvttbl:row value="expirationDate"/>-->
+<!--                    <pvttbl:row value="packageQuantity"/>-->
+<!--                </pvttbl:rows>-->
+<!--            </pvttbl:pivotTable>-->
+
+<!--        &lt;!&ndash; Expired Pivot &ndash;&gt;-->
+<!--            <pvttbl:pivotTable id="expiredPivotTable" dataContainer="expiredDc"-->
+<!--                               showUI="true" height="400px" width="100%"-->
+<!--                               showColumnTotals="true" showRowTotals="true">-->
+<!--                <pvttbl:properties>-->
+<!--                    <pvttbl:property name="brandName"/>-->
+<!--                    <pvttbl:property name="expirationDate"/>-->
+<!--                    <pvttbl:property name="packageQuantity"/>-->
+<!--                    <pvttbl:property name="pricePerPackage"/>-->
+<!--                </pvttbl:properties>-->
+<!--                <pvttbl:rows>-->
+<!--                    <pvttbl:row value="brandName"/>-->
+<!--                    <pvttbl:row value="expirationDate"/>-->
+<!--                    <pvttbl:row value="packageQuantity"/>-->
+<!--                </pvttbl:rows>-->
+<!--            </pvttbl:pivotTable>-->
+
+<!--        &lt;!&ndash; Low Stock Pivot &ndash;&gt;-->
+<!--            <pvttbl:pivotTable id="lowStockPivotTable" dataContainer="lowStockDc"-->
+<!--                               showUI="true" height="400px" width="100%"-->
+<!--                               showColumnTotals="true" showRowTotals="true">-->
+<!--                <pvttbl:properties>-->
+<!--                    <pvttbl:property name="brandName"/>-->
+<!--                    <pvttbl:property name="packageQuantity"/>-->
+<!--                    <pvttbl:property name="pricePerPackage"/>-->
+<!--                    <pvttbl:property name="expirationDate"/>-->
+<!--                </pvttbl:properties>-->
+<!--                <pvttbl:rows>-->
+<!--                    <pvttbl:row value="brandName"/>-->
+<!--                    <pvttbl:row value="packageQuantity"/>-->
+<!--                    <pvttbl:row value="expirationDate"/>-->
+<!--                </pvttbl:rows>-->
+<!--            </pvttbl:pivotTable>-->
+
+<!--        &lt;!&ndash; Out of Stock Pivot &ndash;&gt;-->
+<!--            <pvttbl:pivotTable id="outOfStockPivotTable" dataContainer="outOfStockDc"-->
+<!--                               showUI="true" height="400px" width="100%"-->
+<!--                               showColumnTotals="true" showRowTotals="true">-->
+<!--                <pvttbl:properties>-->
+<!--                    <pvttbl:property name="brandName"/>-->
+<!--                    <pvttbl:property name="activeIngredientName"/>-->
+<!--                    <pvttbl:property name="pricePerPackage"/>-->
+<!--                    <pvttbl:property name="expirationDate"/>-->
+<!--                </pvttbl:properties>-->
+<!--                <pvttbl:rows>-->
+<!--                    <pvttbl:row value="brandName"/>-->
+<!--                    <pvttbl:row value="activeIngredientName"/>-->
+<!--                    <pvttbl:row value="expirationDate"/>-->
+<!--                </pvttbl:rows>-->
+<!--            </pvttbl:pivotTable>-->
     </layout>
 </view>

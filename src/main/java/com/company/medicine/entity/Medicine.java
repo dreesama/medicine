@@ -1,7 +1,5 @@
 package com.company.medicine.entity;
 
-import io.jmix.core.DeletePolicy;
-import io.jmix.core.entity.annotation.OnDeleteInverse;
 import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import io.jmix.data.DdlGeneration;
@@ -10,7 +8,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.DISABLED)
+@DdlGeneration(value = DdlGeneration.DbScriptGenerationMode.CREATE_ONLY)
 @JmixEntity
 @Table(name = "medicine")
 @Entity
@@ -19,7 +17,6 @@ public class Medicine {
     @Column(name = "id", nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @OnDeleteInverse(DeletePolicy.UNLINK)
     private Integer id;
 
     @Column(name = "active_ingredient_name")

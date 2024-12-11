@@ -19,14 +19,16 @@ public class Stock {
     @Column(name = "ID", nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @OnDeleteInverse(DeletePolicy.UNLINK)
     private Integer id;
 
     @Column(name = "DATE_ADDED")
     private LocalDateTime dateAdded;
+
+    @OnDeleteInverse(DeletePolicy.UNLINK)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medicine_id")
     private Medicine medicine;
+
     @Column(name = "brand_name")
     private String brandName;
     @Column(name = "active_ingredient_name")
@@ -60,6 +62,14 @@ public class Stock {
     @JoinColumn(name = "CREATED_BY_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public User getCreatedBy() {
         return createdBy;
@@ -123,15 +133,6 @@ public class Stock {
 
     public PackageType getPackageType() {
         return packageType == null ? null : PackageType.fromId(packageType);
-    }
-
-    // Getters and Setters
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Medicine getMedicine() {

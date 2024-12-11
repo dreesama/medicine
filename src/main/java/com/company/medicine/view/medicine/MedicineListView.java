@@ -24,7 +24,7 @@ import java.util.List;
 @ViewDescriptor("medicine-list-view.xml")
 @LookupComponent("medicinesDataGrid")
 @DialogMode(width = "64em")
-public class  MedicineListView extends StandardListView<Medicine> {
+public class MedicineListView extends StandardListView<Medicine> {
 
     @Autowired
     private MedicineListPdfExportService medicineListPdfExportService;
@@ -47,8 +47,20 @@ public class  MedicineListView extends StandardListView<Medicine> {
     @Subscribe
     public void onInit(InitEvent event) {
         exportPdfBtn.addClickListener(e -> exportToPdf());
-//        exportExcelBtn.addClickListener(e -> exportToExcel());
 
+        // Add Kommunicate chat widget with your exact script
+        String chatScript = """
+            (function(d, m){
+                var kommunicateSettings = 
+                    {"appId":"9c268b8c89e3437d7569c763ee31dc77","popupWidget":true,"automaticChatOpenOnNavigation":true};
+                var s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
+                s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
+                var h = document.getElementsByTagName("head")[0]; h.appendChild(s);
+                window.kommunicate = m; m._globals = kommunicateSettings;
+            })(document, window.kommunicate || {});
+        """;
+
+        getUI().ifPresent(ui -> ui.getPage().executeJs(chatScript));
     }
 
     private List<Medicine> loadAllMedicines() {
@@ -57,45 +69,8 @@ public class  MedicineListView extends StandardListView<Medicine> {
                 .list();
     }
 
-//    private void exportToExcel() {
-//        try {
-//            // Load all medicines instead of using the container
-//            List<Medicine> medicines = loadAllMedicines();
-//            byte[] excelBytes = medicineExcelExportService.exportMedicinesToExcel(medicines);
-//
-//            String fileName = "medicine_list.xlsx";
-//            StreamResource resource = new StreamResource(fileName,
-//                    () -> new ByteArrayInputStream(excelBytes));
-//
-//            Anchor downloadLink = new Anchor(resource, "");
-//            downloadLink.getElement().setAttribute("download", true);
-//            downloadLink.setHref(resource);
-//            downloadLink.getElement().setAttribute("type",
-//                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//
-//            getUI().ifPresent(ui -> {
-//                ui.getElement().appendChild(downloadLink.getElement());
-//                downloadLink.getElement().executeJs(
-//                        "const link = this;" +
-//                                "setTimeout(() => {" +
-//                                "  link.click();" +
-//                                "  link.remove();" +
-//                                "}, 100);"
-//                );
-//            });
-//
-//            Notification.show("Report Generated",
-//                    3000, Notification.Position.MIDDLE);
-//        } catch (Exception e) {
-//            Notification.show("Error generating Excel: " + e.getMessage(),
-//                    3000, Notification.Position.MIDDLE);
-//            e.printStackTrace();
-//        }
-//    }
-
     private void exportToPdf() {
         try {
-            // Load all medicines instead of using the container
             List<Medicine> medicines = loadAllMedicines();
             byte[] pdfBytes = medicineListPdfExportService.exportMedicineListToPdf(medicines);
 
@@ -127,4 +102,42 @@ public class  MedicineListView extends StandardListView<Medicine> {
             e.printStackTrace();
         }
     }
+
+    // Commented out Excel export functionality as per your original code
+    /*
+    private void exportToExcel() {
+        try {
+            List<Medicine> medicines = loadAllMedicines();
+            byte[] excelBytes = medicineExcelExportService.exportMedicinesToExcel(medicines);
+
+            String fileName = "medicine_list.xlsx";
+            StreamResource resource = new StreamResource(fileName,
+                    () -> new ByteArrayInputStream(excelBytes));
+
+            Anchor downloadLink = new Anchor(resource, "");
+            downloadLink.getElement().setAttribute("download", true);
+            downloadLink.setHref(resource);
+            downloadLink.getElement().setAttribute("type",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            getUI().ifPresent(ui -> {
+                ui.getElement().appendChild(downloadLink.getElement());
+                downloadLink.getElement().executeJs(
+                        "const link = this;" +
+                                "setTimeout(() => {" +
+                                "  link.click();" +
+                                "  link.remove();" +
+                                "}, 100);"
+                );
+            });
+
+            Notification.show("Report Generated",
+                    3000, Notification.Position.MIDDLE);
+        } catch (Exception e) {
+            Notification.show("Error generating Excel: " + e.getMessage(),
+                    3000, Notification.Position.MIDDLE);
+            e.printStackTrace();
+        }
+    }
+    */
 }

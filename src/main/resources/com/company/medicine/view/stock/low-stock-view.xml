@@ -28,7 +28,7 @@
     </actions>
     <layout>
         <genericFilter id="genericFilter"
-                       dataLoader="stocksDl">
+                       dataLoader="stocksDl" visible="false" enabled="false">
             <properties include=".*"/>
         </genericFilter>
         <hbox id="buttonsPanel" classNames="buttons-panel">
@@ -51,24 +51,24 @@
                 <action id="remove" type="list_remove"/>
             </actions>
             <columns resizable="true">
-                <column property="brandName"/>
-                <column property="activeIngredientName"/>
+                <column property="brandName" filterable="true"/>
+                <column property="activeIngredientName" filterable="true"/>
                 <column property="activeIngredientStrength"/>
-                <column property="dosageForm"/>
+                <column property="dosageForm" filterable="true"/>
                 <!--                <column property="price"/>-->
-                <column property="expirationDate"/>
+                <column property="expirationDate" filterable="true"/>
                 <column property="packageType"/>
-                <column property="unitType"/>
-                <column property="unitsPerPackage"/>
-                <column property="packageQuantity"/>
+                <column property="unitType" filterable="true"/>
+                <column property="unitsPerPackage" filterable="true"/>
+                <column property="packageQuantity" filterable="true"/>
                 <!--                <column property="unitPrice"/>-->
-                <column property="storageLocation"/>
-                <column property="storageConditions"/>
-                <column property="totalUnits"/>
-                <column property="pricePerPackage"/>
-                <column property="pricePerUnit"/>
-                <column property="dateAdded"/>
-                <column property="createdBy"/>
+                <column property="storageLocation" filterable="true"/>
+                <column property="storageConditions" filterable="true"/>
+                <column property="totalUnits" filterable="true"/>
+                <column property="pricePerPackage" filterable="true"/>
+                <column property="pricePerUnit" filterable="true"/>
+                <column property="dateAdded" filterable="true"/>
+                <column property="createdBy" filterable="true"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">
